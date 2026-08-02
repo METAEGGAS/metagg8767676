@@ -10,43 +10,39 @@ body{background:#130d09;color:#fff;min-height:100vh;display:flex;justify-content
 .bal::after{content:"";position:absolute;top:10px;right:20px;width:60px;height:40px;background:radial-gradient(ellipse,#2e1c12 0%,transparent 70%);opacity:.5}
 .bal .lbl{color:#e0cfc3;font-size:13px;margin-bottom:10px;position:relative;z-index:1}
 .bal .amt{color:#fff;font-size:32px;font-weight:400;letter-spacing:2px;font-family:'Courier New',monospace;position:relative;z-index:1}
-.card{background:#22160f;border-radius:16px;padding:18px;position:relative}
+.card{background:#22160f;border-radius:16px;padding:18px}
 .sec-lbl{font-size:14px;color:#fff;font-weight:500;margin-bottom:12px;margin-top:4px}
 .sec-lbl:not(:first-child){margin-top:18px}
-.nets{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px}
+.nets{display:flex;flex-wrap:wrap;gap:10px}
 .net{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;border:1px solid #4a3628;background:transparent;color:#fff;font-size:13px;cursor:pointer;transition:.2s}
 .net.active{background:#df8f2d;border-color:#df8f2d;color:#fff}
-.net .ico{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
-.ico.tether{background:#26a17b}
-.ico.usdc{background:#2775ca}
-.ico.trx{background:#eb0029}
+.net img{width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0}
 .input{width:100%;background:#362318;border:none;border-radius:10px;padding:14px 16px;color:#fff;font-size:14px;outline:none}
 .input::placeholder{color:#8a7364}
-.amt-wrap{position:relative}
+.amt-wrap,.pin-wrap{position:relative}
 .amt-wrap .all{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:#df8f2d;font-size:14px;background:none;border:none;cursor:pointer;font-weight:500}
 .amt-wrap .input{padding-right:60px}
-.limits{font-size:11px;color:#a68d7c;margin-top:8px;line-height:1.6}
-.pin-wrap{position:relative}
 .pin-wrap .eye{position:absolute;right:16px;top:50%;transform:translateY(-50%);background:none;border:none;color:#a68d7c;cursor:pointer;font-size:16px}
 .pin-wrap .input{padding-right:44px}
+.limits{font-size:11px;color:#a68d7c;margin-top:8px;line-height:1.6}
 .recv{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding:0 4px;font-size:13px;color:#a68d7c}
 .recv .val{color:#fff;font-weight:500}
 .confirm{width:100%;background:#df8f2d;border:none;border-radius:12px;padding:15px;color:#fff;font-size:16px;font-weight:600;margin-top:18px;cursor:pointer}
 .confirm:hover{background:#c97e22}
-.support{position:absolute;top:230px;right:8px;width:42px;height:42px;border-radius:50%;overflow:hidden;border:2px solid #22160f;cursor:pointer;background:#4a3628}
-.support img{width:100%;height:100%;object-fit:cover}
+.note{margin-top:22px;padding:0 4px;color:#a68d7c;font-size:12px;line-height:1.8}
+.note h4{color:#df8f2d;font-size:13px;font-weight:600;margin-bottom:8px}
+.note p{margin-bottom:10px}
 </style></head><body><div class="app">
 <div class="hdr"><button class="back">‹</button><h1>Withdraw</h1><button class="hist">🕒</button></div>
 <div class="bal"><div class="lbl">Available (USDT)</div><div class="amt">0.000000</div></div>
-<div class="support"><img src="https://i.pravatar.cc/80?img=47" alt=""></div>
 <div class="card">
 <div class="sec-lbl">Select Network</div>
 <div class="nets">
-<button class="net active"><span class="ico tether">₮</span>BEP20-USDT</button>
-<button class="net"><span class="ico tether">₮</span>TRC20-USDT</button>
-<button class="net"><span class="ico usdc">$</span>POLYGON-USDC</button>
-<button class="net"><span class="ico trx">▼</span>TRX</button>
-<button class="net"><span class="ico tether">₮</span>ETH-USDT</button>
+<button class="net active"><img src="https://api.awesomeminer-vip.com/static/image/bep20-usdt.webp" alt="">BEP20-USDT</button>
+<button class="net"><img src="https://api.awesomeminer-vip.com/static/image/trc20-usdt.jpg" alt="">TRC20-USDT</button>
+<button class="net"><img src="https://api.awesomeminer-vip.com/static/image/polygon-usdc.webp" alt="">POLYGON-USDC</button>
+<button class="net"><img src="https://api.awesomeminer-vip.com/static/image/trx.webp" alt="">TRX</button>
+<button class="net"><img src="https://api.awesomeminer-vip.com/static/image/eth-usdt.webp" alt="">ETH-USDT</button>
 </div>
 <div class="sec-lbl">Withdrawal Address</div>
 <input class="input" placeholder="Paste or enter address">
@@ -57,7 +53,11 @@ body{background:#130d09;color:#fff;min-height:100vh;display:flex;justify-content
 <div class="pin-wrap"><input class="input" type="password" placeholder="Security PIN"><button class="eye" onclick="var i=this.previousElementSibling;i.type=i.type==='password'?'text':'password'">👁</button></div>
 <div class="recv"><span>You will get:</span><span class="val">0 USDT</span></div>
 <button class="confirm">Confirm</button>
-</div></div>
+</div>
+<div class="note"><h4>ملحوظة</h4>
+<p>الحد الأدنى لمبلغ السحب لـ BEP20 هو 1USDT، والحد الأدنى لمبلغ السحب لـ TRC20 هو 10USDT. وهو يدعم عمليات السحب على مدار 24 ساعة. رسوم السحب هي 10%-20% (نظرًا لأنه يجب دفع الضرائب، يلزم دفع رسوم السحب)</p>
+<p>اعتمادًا على الوقت والمنطقة الخاصة بكل بلد، فإن أسرع وقت للسحب هو دقيقة واحدة وأبطأ وقت هو 24 ساعة. يرجى الانتظار بصبر. إذا لم يصل حسابك خلال 24 ساعة، يرجى الاتصال بخدمة العملاء عبر الإنترنت.</p></div>
+</div>
 <script>
 document.querySelectorAll('.net').forEach(b=>b.onclick=()=>{document.querySelectorAll('.net').forEach(x=>x.classList.remove('active'));b.classList.add('active')});
 </script></body></html>
