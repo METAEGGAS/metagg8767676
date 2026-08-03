@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2a1d13">
+<title>CREFTX | لوحة التحكم</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Tahoma',sans-serif;-webkit-tap-highlight-color:transparent}
+:root{--bg:#2a1d13;--bg2:#22160f;--bg3:#3a2818;--bg4:#3e2a1a;--gold:#E8B870;--gold2:#e8a54a;--gold3:#c78030;--border:#4a3220;--border2:#5a4020;--txt:#fff;--txt2:#e0cfc3;--txt3:#a68d7c;--txt4:#8a7a75;--green:#4ade80;--red:#ef4444;--orange:#f59e0b;--blue:#3b82f6;--radius:14px}
+body{background:var(--bg);color:var(--txt);min-height:100vh}
+
+/* ===== LOGIN ===== */
+#loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:20px;padding:20px}
+#loginScreen::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(232,184,112,.08),transparent 40%),radial-gradient(circle at 80% 70%,rgba(232,184,112,.06),transparent 40%);pointer-events:none}
+.login-box{background:linear-gradient(145deg,#3e2a1a,#332214);border:1.5px solid var(--gold);border-radius:22px;padding:36px 28px;max-width:380px;width:100%;text-align:center;position:relative;z-index:1;box-shadow:0 0 0 1px rgba(232,184,112,.2),0 8px 40px rgba(0,0,0,.4)}
+.login-logo{width:64px;height:64px;border-radius:50%;background:linear-gradient(145deg,#E8B870,#c78030);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--bg);letter-spacing:1px}
+.login-title{font-size:22px;font-weight:700;color:var(--gold);margin-bottom:6px;letter-spacing:1px}
+.login-sub{font-size:13px;color:var(--txt3);margin-bottom:24px}
+.login-input{width:100%;background:#362318;border:1px solid #4a3628;border-radius:14px;padding:16px 18px;color:#fff;font-size:16px;outline:none;text-align:center;letter-spacing:4px;margin-bottom:16px;transition:border .2s}
+.login-input:focus{border-color:var(--gold)}
+.login-input::placeholder{color:#8a7364;letter-spacing:1px}
+.login-btn{width:100%;background:linear-gradient(145deg,#E8B870,#c78030);border:none;color:var(--bg);font-size:16px;font-weight:700;padding:15px;border-radius:14px;cursor:pointer;letter-spacing:1px;transition:transform .15s,filter .2s}
+.login-btn:active{transform:scale(.97)}
+.login-btn:hover{filter:brightness(1.08)}
+.login-err{color:var(--red);font-size:13px;margin-top:12px;min-height:18px}
+
+/* ===== MAIN APP ===== */
+#app{display:none;flex-direction:column;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;right:0;width:260px;height:100vh;background:linear-gradient(180deg,#2a1d13 0%,#1a120b 100%);border-left:1.5px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.sidebar.hide{transform:translateX(100%)}
+.sb-header{padding:22px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.sb-logo{width:42px;height:42px;border-radius:50%;background:linear-gradient(145deg,#E8B870,#c78030);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--bg);flex-shrink:0}
+.sb-brand{font-size:18px;font-weight:700;color:var(--gold);letter-spacing:1px}
+.sb-brand-sub{font-size:11px;color:var(--txt4);margin-top:2px}
+.sb-nav{flex:1;overflow-y:auto;padding:16px 12px}
+.sb-nav::-webkit-scrollbar{width:5px}
+.sb-nav::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.sb-section-title{font-size:11px;color:var(--txt4);text-transform:uppercase;letter-spacing:1.5px;padding:14px 12px 8px;font-weight:600}
+.sb-item{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:12px;cursor:pointer;transition:background .2s;color:var(--txt2);font-size:14px;font-weight:500;margin-bottom:4px;position:relative}
+.sb-item:hover{background:rgba(232,184,112,.08)}
+.sb-item.active{background:linear-gradient(145deg,rgba(232,184,112,.15),rgba(232,184,112,.05));color:var(--gold);border:1px solid rgba(232,184,112,.25)}
+.sb-item.active::before{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);width:3px;height:24px;background:var(--gold);border-radius:2px}
+.sb-item svg{width:20px;height:20px;flex-shrink:0;opacity:.85}
+.sb-badge{margin-right:auto;background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;min-width:22px;text-align:center}
+.sb-badge.gold{background:var(--gold2);color:var(--bg)}
+.sb-footer{padding:16px 20px;border-top:1px solid var(--border)}
+.sb-logout{width:100%;background:transparent;border:1px solid #4a3628;color:var(--txt3);font-size:13px;padding:12px;border-radius:12px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit}
+.sb-logout:hover{background:rgba(239,68,68,.1);border-color:var(--red);color:var(--red)}
+.sb-logout svg{width:18px;height:18px}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;background:rgba(42,29,19,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:16px;z-index:50}
+.menu-toggle{width:40px;height:40px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.menu-toggle svg{width:22px;height:22px}
+.topbar-title{font-size:20px;font-weight:700;color:#fff;flex:1}
+.topbar-title .sub{font-size:12px;color:var(--txt4);font-weight:400;margin-top:2px}
+.topbar-user{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:30px;padding:6px 16px 6px 6px}
+.topbar-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(145deg,#E8B870,#c78030);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--bg)}
+.topbar-email{font-size:13px;color:var(--txt2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* MAIN CONTENT */
+.main{margin-right:260px;flex:1;padding:24px;transition:margin .3s}
+.main.full{margin-right:0}
+.page{display:none;animation:fadeUp .4s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* STAT CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:linear-gradient(145deg,#3e2a1a,#332214);border:1px solid var(--border);border-radius:var(--radius);padding:22px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.stat-card::after{content:"";position:absolute;top:-20px;left:-20px;width:100px;height:70px;background:radial-gradient(ellipse,rgba(232,184,112,.12),transparent 70%);pointer-events:none}
+.stat-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.stat-icon svg{width:24px;height:24px}
+.stat-icon.gold{background:rgba(232,184,112,.15)}
+.stat-icon.gold svg{fill:var(--gold)}
+.stat-icon.green{background:rgba(74,222,128,.12)}
+.stat-icon.green svg{fill:var(--green)}
+.stat-icon.red{background:rgba(239,68,68,.12)}
+.stat-icon.red svg{fill:var(--red)}
+.stat-icon.blue{background:rgba(59,130,246,.12)}
+.stat-icon.blue svg{fill:var(--blue)}
+.stat-label{font-size:13px;color:var(--txt3);margin-bottom:6px}
+.stat-value{font-size:26px;font-weight:700;color:#fff;font-family:'Courier New',monospace}
+.stat-foot{font-size:12px;color:var(--txt4);margin-top:8px}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.section-title{font-size:18px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:10px}
+.section-title svg{width:22px;height:22px;fill:var(--gold)}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.filter-tab{padding:9px 18px;border-radius:30px;background:var(--bg3);border:1px solid var(--border);color:var(--txt2);font-size:13px;cursor:pointer;transition:.2s;font-family:inherit;font-weight:500}
+.filter-tab:hover{border-color:var(--gold)}
+.filter-tab.active{background:linear-gradient(145deg,#E8B870,#c78030);color:var(--bg);border-color:var(--gold);font-weight:600}
+.search-box{flex:1;min-width:200px;position:relative}
+.search-box input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:30px;padding:10px 18px 10px 42px;color:#fff;font-size:13px;outline:none;font-family:inherit}
+.search-box input::placeholder{color:var(--txt4)}
+.search-box input:focus{border-color:var(--gold)}
+.search-box svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;fill:var(--txt4)}
+
+/* TABLE */
+.table-wrap{background:linear-gradient(145deg,#3e2a1a,#332214);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+thead tr{background:#22160f}
+th{padding:14px 16px;text-align:right;font-size:12px;color:var(--gold);font-weight:600;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap}
+th:first-child{text-align:center}
+td{padding:14px 16px;font-size:13px;color:var(--txt2);border-bottom:1px solid rgba(74,50,32,.4);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:rgba(232,184,112,.04)}
+.td-center{text-align:center}
+.td-mono{font-family:'Courier New',monospace;font-size:12px}
+.td-email{direction:ltr;text-align:left;font-size:12px}
+
+/* STATUS BADGES */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%}
+.badge.pending{background:rgba(245,158,11,.15);color:var(--orange);border:1px solid rgba(245,158,11,.3)}
+.badge.pending::before{background:var(--orange)}
+.badge.approved{background:rgba(74,222,128,.15);color:var(--green);border:1px solid rgba(74,222,128,.3)}
+.badge.approved::before{background:var(--green)}
+.badge.rejected{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.badge.rejected::before{background:var(--red)}
+.badge.active{background:rgba(74,222,128,.15);color:var(--green);border:1px solid rgba(74,222,128,.3)}
+.badge.active::before{background:var(--green)}
+.badge.blocked{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.badge.blocked::before{background:var(--red)}
+
+/* ACTION BUTTONS */
+.act-btns{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.act-btn{width:34px;height:34px;border-radius:9px;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;background:var(--bg3)}
+.act-btn svg{width:16px;height:16px}
+.act-btn.approve{border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.08)}
+.act-btn.approve svg{fill:var(--green)}
+.act-btn.approve:hover{background:rgba(74,222,128,.2)}
+.act-btn.reject{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.08)}
+.act-btn.reject svg{fill:var(--red)}
+.act-btn.reject:hover{background:rgba(239,68,68,.2)}
+.act-btn.edit{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.08)}
+.act-btn.edit svg{fill:var(--blue)}
+.act-btn.edit:hover{background:rgba(59,130,246,.2)}
+.act-btn.delete{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.08)}
+.act-btn.delete svg{fill:var(--red)}
+.act-btn.delete:hover{background:rgba(239,68,68,.2)}
+.act-btn.block{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.08)}
+.act-btn.block svg{fill:var(--orange)}
+.act-btn.block:hover{background:rgba(245,158,11,.2)}
+.act-btn.view{border-color:rgba(232,184,112,.3);background:rgba(232,184,112,.08)}
+.act-btn.view svg{fill:var(--gold)}
+.act-btn.view:hover{background:rgba(232,184,112,.2)}
+
+/* EMPTY STATE */
+.empty-state{padding:60px 20px;text-align:center}
+.empty-state svg{width:60px;height:60px;opacity:.3;margin-bottom:14px}
+.empty-state p{color:var(--txt4);font-size:14px}
+
+/* LOADER */
+.loader-row{display:flex;align-items:center;justify-content:center;padding:60px 20px}
+.spinner{width:40px;height:40px;border:3px solid rgba(232,184,112,.2);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.active{display:flex}
+.modal{background:linear-gradient(145deg,#3e2a1a,#332214);border:1.5px solid var(--gold);border-radius:18px;padding:28px 24px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 12px 50px rgba(0,0,0,.5);animation:modalIn .3s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.92) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:17px;font-weight:700;color:var(--gold)}
+.modal-close{width:34px;height:34px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);color:#fff;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:rgba(239,68,68,.15);border-color:var(--red);color:var(--red)}
+.modal-body{margin-bottom:20px}
+.modal-field{margin-bottom:14px}
+.modal-field label{display:block;font-size:12px;color:var(--txt3);margin-bottom:6px;font-weight:500}
+.modal-field input,.modal-field select,.modal-field textarea{width:100%;background:#362318;border:1px solid #4a3628;border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;font-family:inherit;transition:border .2s}
+.modal-field input:focus,.modal-field select:focus,.modal-field textarea:focus{border-color:var(--gold)}
+.modal-field input:read-only{opacity:.6;cursor:not-allowed}
+.modal-field-row{display:flex;gap:12px}
+.modal-field-row .modal-field{flex:1}
+.modal-info{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px}
+.modal-info-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px}
+.modal-info-row:not(:last-child){border-bottom:1px solid rgba(74,50,32,.3)}
+.modal-info-row .lbl{color:var(--txt3)}
+.modal-info-row .val{color:#fff;font-weight:500}
+.modal-actions{display:flex;gap:10px}
+.btn{padding:13px 20px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:.2s;flex:1;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:scale(.97)}
+.btn-gold{background:linear-gradient(145deg,#E8B870,#c78030);color:var(--bg)}
+.btn-gold:hover{filter:brightness(1.1)}
+.btn-red{background:linear-gradient(145deg,#ef4444,#dc2626);color:#fff}
+.btn-red:hover{filter:brightness(1.1)}
+.btn-ghost{background:transparent;border:1px solid #4a3628;color:var(--txt2)}
+.btn-ghost:hover{background:var(--bg3)}
+
+/* TOAST */
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.88);color:#fff;padding:12px 28px;border-radius:30px;font-size:14px;z-index:2000;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(-8px)}
+#toast.success{border:1px solid var(--green)}
+#toast.error{border:1px solid var(--red)}
+
+/* MOBILE */
+.overlay-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
+.overlay-bg.active{display:block}
+@media(max-width:1024px){
+  .sidebar{transform:translateX(100%)}
+  .sidebar.show{transform:translateX(0)}
+  .main{margin-right:0}
+}
+@media(max-width:640px){
+  .main{padding:16px}
+  .topbar{padding:14px 16px}
+  .stats-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .stat-card{padding:16px}
+  .stat-value{font-size:20px}
+  .topbar-email{display:none}
+  .topbar-user{padding:4px}
+  .filter-bar{gap:8px}
+  .filter-tab{padding:8px 14px;font-size:12px}
+  th,td{padding:10px 12px;font-size:12px}
+}
+@media(max-width:420px){
+  .stats-grid{grid-template-columns:1fr}
+}
+
+/* USER DETAIL MODAL */
+.ud-section{margin-bottom:18px}
+.ud-section-title{font-size:13px;color:var(--gold);font-weight:600;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(232,184,112,.15)}
+.ud-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ud-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px}
+.ud-item .lbl{font-size:11px;color:var(--txt4);margin-bottom:4px}
+.ud-item .val{font-size:14px;color:#fff;font-weight:600;font-family:'Courier New',monospace}
+@media(max-width:480px){.ud-grid{grid-template-columns:1fr}}
+
+/* CONFIRM */
+.confirm-icon{width:56px;height:56px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center}
+.confirm-icon.warn{background:rgba(245,158,11,.15)}
+.confirm-icon.danger{background:rgba(239,68,68,.15)}
+.confirm-icon svg{width:28px;height:28px}
+.confirm-text{text-align:center;font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:6px}
+.confirm-sub{text-align:center;font-size:12px;color:var(--txt4);margin-bottom:20px}
+
+/* PAGINATION */
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:18px}
+.pg-btn{width:36px;height:36px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);color:var(--txt2);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}
+.pg-btn:hover{border-color:var(--gold)}
+.pg-btn.active{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:600}
+.pg-btn:disabled{opacity:.4;cursor:not-allowed}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="loginScreen">
+<div class="login-box">
+<div class="login-logo">CX</div>
+<div class="login-title">CREFTX لوحة التحكم</div>
+<div class="login-sub">لوحة إدارة الموقع — للمشرفين فقط</div>
+<input type="password" class="login-input" id="loginPass" placeholder="أدخل كلمة المرور" autocomplete="off" maxlength="10">
+<button class="login-btn" onclick="doLogin()">دخول لوحة التحكم</button>
+<div class="login-err" id="loginErr"></div>
+</div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="app">
+
+<!-- SIDEBAR -->
+<div class="overlay-bg" id="overlayBg" onclick="toggleSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+<div class="sb-header">
+<div class="sb-logo">CX</div>
+<div>
+<div class="sb-brand">CREFTX</div>
+<div class="sb-brand-sub">لوحة الإدارة</div>
+</div>
+</div>
+<nav class="sb-nav">
+<div class="sb-section-title">الرئيسية</div>
+<div class="sb-item active" data-page="dashboard" onclick="goPage('dashboard')">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+لوحة المعلومات
+</div>
+
+<div class="sb-section-title">الإدارة</div>
+<div class="sb-item" data-page="deposits" onclick="goPage('deposits')">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 10h3l-4 4-4-4h3V6h2v6z"/></svg>
+الإيداعات
+<span class="sb-badge" id="depBadge" style="display:none">0</span>
+</div>
+<div class="sb-item" data-page="withdrawals" onclick="goPage('withdrawals')">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 8V4h2v6h3l-4 4-4-4h3z"/></svg>
+السحوبات
+<span class="sb-badge" id="wdBadge" style="display:none">0</span>
+</div>
+<div class="sb-item" data-page="users" onclick="goPage('users')">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+المستخدمون
+<span class="sb-badge gold" id="usrBadge" style="display:none">0</span>
+</div>
+<div class="sb-item" data-page="transactions" onclick="goPage('transactions')">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2-9h-1V0h-2v2H8V0H6v2H5C3.9 2 3 2.9 3 4v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H5V8h14v12z"/></svg>
+المعاملات
+</div>
+
+<div class="sb-section-title">أخرى</div>
+<div class="sb-item" data-page="support" onclick="goPage('support')">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+الدعم الفني
+</div>
+<div class="sb-item" data-page="settings" onclick="goPage('settings')">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+الإعدادات
+</div>
+</nav>
+<div class="sb-footer">
+<button class="sb-logout" onclick="doLogout()">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+تسجيل الخروج
+</button>
+</div>
+</aside>
+
+<!-- TOPBAR + CONTENT -->
+<div style="flex:1;display:flex;flex-direction:column;min-width:0">
+<header class="topbar">
+<button class="menu-toggle" onclick="toggleSidebar()">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+</button>
+<div class="topbar-title" id="topbarTitle">لوحة المعلومات<div class="sub" id="topbarSub">نظرة عامة على الموقع</div></div>
+<div class="topbar-user">
+<div class="topbar-avatar">A</div>
+<span class="topbar-email" id="topbarEmail">admin</span>
+</div>
+</header>
+
+<div class="main" id="mainContent">
+
+<!-- DASHBOARD -->
+<div class="page active" id="pg-dashboard">
+<div class="stats-grid">
+<div class="stat-card">
+<div class="stat-icon gold"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 10h3l-4 4-4-4h3V6h2v6z"/></svg></div>
+<div class="stat-label">إجمالي الإيداعات</div>
+<div class="stat-value" id="stTotalDep">$0.00</div>
+<div class="stat-foot" id="stDepCount">0 طلب</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon red"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 8V4h2v6h3l-4 4-4-4h3z"/></svg></div>
+<div class="stat-label">إجمالي السحوبات</div>
+<div class="stat-value" id="stTotalWd">$0.00</div>
+<div class="stat-foot" id="stWdCount">0 طلب</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3z"/></svg></div>
+<div class="stat-label">إجمالي المستخدمين</div>
+<div class="stat-value" id="stTotalUsers">0</div>
+<div class="stat-foot" id="stActiveUsers">0 نشط</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2-9h-1V0h-2v2H8V0H6v2H5C3.9 2 3 2.9 3 4v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div>
+<div class="stat-label">المعاملات المعلقة</div>
+<div class="stat-value" id="stPending">0</div>
+<div class="stat-foot" id="stPendingFoot">بانتظار المراجعة</div>
+</div>
+</div>
+
+<div class="stats-grid">
+<div class="stat-card">
+<div class="stat-icon gold"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
+<div class="stat-label">صافي الإيرادات</div>
+<div class="stat-value" id="stNetRevenue">$0.00</div>
+<div class="stat-foot">الإيداعات - السحوبات</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg></div>
+<div class="stat-label">إيداعات اليوم</div>
+<div class="stat-value" id="stTodayDep">$0.00</div>
+<div class="stat-foot" id="stTodayDepCount">0 اليوم</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon red"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg></div>
+<div class="stat-label">سحوبات اليوم</div>
+<div class="stat-value" id="stTodayWd">$0.00</div>
+<div class="stat-foot" id="stTodayWdCount">0 اليوم</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3z"/></svg></div>
+<div class="stat-label">مستخدمون جدد اليوم</div>
+<div class="stat-value" id="stTodayUsers">0</div>
+<div class="stat-foot">تسجيلوا اليوم</div>
+</div>
+</div>
+
+<div class="section-header" style="margin-top:20px">
+<div class="section-title">
+<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.89-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+أحدث المعاملات
+</div>
+</div>
+<div class="table-wrap">
+<div class="table-scroll">
+<table>
+<thead><tr><th>النوع</th><th>المستخدم</th><th>المبلغ</th><th>الشبكة</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+<tbody id="recentTxBody">
+<tr><td colspan="6"><div class="loader-row"><div class="spinner"></div></div></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- DEPOSITS -->
+<div class="page" id="pg-deposits">
+<div class="section-header">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 10h3l-4 4-4-4h3V6h2v6z"/></svg>إدارة الإيداعات</div>
+</div>
+<div class="filter-bar">
+<div class="filter-tab active" data-dfilter="all" onclick="depFilter('all')">الكل</div>
+<div class="filter-tab" data-dfilter="pending" onclick="depFilter('pending')">معلق</div>
+<div class="filter-tab" data-dfilter="approved" onclick="depFilter('approved')">موافق عليه</div>
+<div class="filter-tab" data-dfilter="rejected" onclick="depFilter('rejected')">مرفوض</div>
+<div class="search-box">
+<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+<input type="text" placeholder="بحث بالبريد أو المبلغ..." id="depSearch" oninput="depRender()">
+</div>
+</div>
+<div class="table-wrap">
+<div class="table-scroll">
+<table>
+<thead><tr><th>#</th><th>البريد</th><th>المبلغ</th><th>الشبكة</th><th>العنوان</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+<tbody id="depBody">
+<tr><td colspan="8"><div class="loader-row"><div class="spinner"></div></div></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="pagination" id="depPagination"></div>
+</div>
+
+<!-- WITHDRAWALS -->
+<div class="page" id="pg-withdrawals">
+<div class="section-header">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 8V4h2v6h3l-4 4-4-4h3z"/></svg>إدارة السحوبات</div>
+</div>
+<div class="filter-bar">
+<div class="filter-tab active" data-wfilter="all" onclick="wdFilter('all')">الكل</div>
+<div class="filter-tab" data-wfilter="pending" onclick="wdFilter('pending')">معلق</div>
+<div class="filter-tab" data-wfilter="approved" onclick="wdFilter('approved')">موافق عليه</div>
+<div class="filter-tab" data-wfilter="rejected" onclick="wdFilter('rejected')">مرفوض</div>
+<div class="search-box">
+<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+<input type="text" placeholder="بحث بالبريد أو المبلغ..." id="wdSearch" oninput="wdRender()">
+</div>
+</div>
+<div class="table-wrap">
+<div class="table-scroll">
+<table>
+<thead><tr><th>#</th><th>البريد</th><th>المبلغ</th><th>الشبكة</th><th>العنوان</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+<tbody id="wdBody">
+<tr><td colspan="8"><div class="loader-row"><div class="spinner"></div></div></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="pagination" id="wdPagination"></div>
+</div>
+
+<!-- USERS -->
+<div class="page" id="pg-users">
+<div class="section-header">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3z"/></svg>إدارة المستخدمين</div>
+</div>
+<div class="filter-bar">
+<div class="filter-tab active" data-ufilter="all" onclick="usrFilter('all')">الكل</div>
+<div class="filter-tab" data-ufilter="active" onclick="usrFilter('active')">نشط</div>
+<div class="filter-tab" data-ufilter="blocked" onclick="usrFilter('blocked')">محظور</div>
+<div class="search-box">
+<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+<input type="text" placeholder="بحث بالبريد..." id="usrSearch" oninput="usrRender()">
+</div>
+</div>
+<div class="table-wrap">
+<div class="table-scroll">
+<table>
+<thead><tr><th>#</th><th>البريد</th><th>الرصيد الاستثماري</th><th>عمولات</th><th>الحالة</th><th>تاريخ التسجيل</th><th>إجراءات</th></tr></thead>
+<tbody id="usrBody">
+<tr><td colspan="7"><div class="loader-row"><div class="spinner"></div></div></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="pagination" id="usrPagination"></div>
+</div>
+
+<!-- TRANSACTIONS -->
+<div class="page" id="pg-transactions">
+<div class="section-header">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2-9h-1V0h-2v2H8V0H6v2H5C3.9 2 3 2.9 3 4v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>جميع المعاملات</div>
+</div>
+<div class="filter-bar">
+<div class="filter-tab active" data-tfilter="all" onclick="txFilter('all')">الكل</div>
+<div class="filter-tab" data-tfilter="deposit" onclick="txFilter('deposit')">إيداع</div>
+<div class="filter-tab" data-tfilter="withdraw" onclick="txFilter('withdraw')">سحب</div>
+<div class="search-box">
+<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+<input type="text" placeholder="بحث..." id="txSearch" oninput="txRender()">
+</div>
+</div>
+<div class="table-wrap">
+<div class="table-scroll">
+<table>
+<thead><tr><th>#</th><th>النوع</th><th>البريد</th><th>المبلغ</th><th>الشبكة</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+<tbody id="txBody">
+<tr><td colspan="7"><div class="loader-row"><div class="spinner"></div></div></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="pagination" id="txPagination"></div>
+</div>
+
+<!-- SUPPORT -->
+<div class="page" id="pg-support">
+<div class="section-header">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>إدارة الدعم الفني</div>
+</div>
+<div class="table-wrap">
+<div class="table-scroll">
+<table>
+<thead><tr><th>#</th><th>المستخدم</th><th>آخر رسالة</th><th>عدد الرسائل</th><th>آخر تحديث</th><th>إجراءات</th></tr></thead>
+<tbody id="supportBody">
+<tr><td colspan="6"><div class="loader-row"><div class="spinner"></div></div></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- SETTINGS -->
+<div class="page" id="pg-settings">
+<div class="section-header">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>الإعدادات</div>
+</div>
+<div class="table-wrap" style="padding:24px">
+<div class="ud-section">
+<div class="ud-section-title">معلومات النظام</div>
+<div class="ud-grid">
+<div class="ud-item"><div class="lbl">اسم المشروع</div><div class="val">CREFTX</div></div>
+<div class="ud-item"><div class="lbl">Firebase Project</div><div class="val">ksksjsh-724f2</div></div>
+<div class="ud-item"><div class="lbl">كلمة مرور اللوحة</div><div class="val">12344</div></div>
+<div class="ud-item"><div class="lbl">إصدار اللوحة</div><div class="val">v1.0</div></div>
+</div>
+</div>
+<div class="ud-section">
+<div class="ud-section-title">إجراءات سريعة</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<button class="btn btn-gold" style="max-width:200px;flex:1" onclick="refreshAll()">تحديث كل البيانات</button>
+<button class="btn btn-ghost" style="max-width:200px;flex:1" onclick="exportData()">تصدير البيانات (JSON)</button>
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- main -->
+</div><!-- topbar+content -->
+</div><!-- app -->
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modalOverlay">
+<div class="modal" id="modalBox">
+<div class="modal-header">
+<div class="modal-title" id="modalTitle">عنوان</div>
+<button class="modal-close" onclick="closeModal()">×</button>
+</div>
+<div class="modal-body" id="modalBody"></div>
+<div class="modal-actions" id="modalActions"></div>
+</div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, query, where, orderBy, serverTimestamp, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDQIKQ5swu_XnVtqET0B9EelRKFjr0LXHI",
+  authDomain: "ksksjsh-724f2.firebaseapp.com",
+  projectId: "ksksjsh-724f2",
+  storageBucket: "ksksjsh-724f2.firebasestorage.app",
+  messagingSenderId: "1046924412561",
+  appId: "1:1046924412561:web:1a40834236da75d0d6e130",
+  measurementId: "G-5D3YJQDH8B"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+window._db = db;
+window._firebase = { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, query, where, orderBy, serverTimestamp, onSnapshot, limit };
+
+/* ===== STATE ===== */
+let allDeposits = [];
+let allWithdrawals = [];
+let allUsers = [];
+let allTransactions = [];
+let allSupport = [];
+let depFilterVal = 'all';
+let wdFilterVal  = 'all';
+let usrFilterVal = 'all';
+let txFilterVal = 'all';
+let txFilterVal = 'all';
+let currentPage = 'dashboard';
+let unsubDeposits = null;
+let unsubWithdrawals = null;
+let unsubUsers = null;
+let ITEMS_PER_PAGE = 15;
+let depPage = 1, wdPage = 1, usrPage = 1, txPage = 1;
+
+/* ===== LOGIN ===== */
+const ADMIN_PASSWORD = '12344';
+window.doLogin = function() {
+  const inp = document.getElementById('loginPass');
+  const err = document.getElementById('loginErr');
+  if (inp.value === ADMIN_PASSWORD) {
+    sessionStorage.setItem('creftx_admin', '1');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    initAdmin();
+  } else {
+    err.textContent = 'كلمة المرور غير صحيحة';
+    inp.value = '';
+    setTimeout(() => { err.textContent = ''; }, 3000);
+  }
+};
+document.getElementById('loginPass').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') window.doLogin();
+});
+
+window.doLogout = function() {
+  sessionStorage.removeItem('creftx_admin');
+  if (unsubDeposits) { try { unsubDeposits(); } catch(e){} }
+  if (unsubWithdrawals) { try { unsubWithdrawals(); } catch(e){} }
+  if (unsubUsers) { try { unsubUsers(); } catch(e){} }
+  location.reload();
+};
+
+/* Auto-login check */
+if (sessionStorage.getItem('creftx_admin') === '1') {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  setTimeout(initAdmin, 100);
+}
+
+/* ===== NAVIGATION ===== */
+window.goPage = function(p) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(x => x.classList.remove('active'));
+  const pg = document.getElementById('pg-' + p);
+  if (pg) pg.classList.add('active');
+  const item = document.querySelector('.sb-item[data-page="' + p + '"]');
+  if (item) item.classList.add('active');
+  currentPage = p;
+
+  const titles = {
+    dashboard: ['لوحة المعلومات', 'نظرة عامة على الموقع'],
+    deposits: ['إدارة الإيداعات', 'مراجعة والموافقة على طلبات الإيداع'],
+    withdrawals: ['إدارة السحوبات', 'مراجعة والموافقة على طلبات السحب'],
+    users: ['إدارة المستخدمين', 'عرض وتعديل وحظر الحسابات'],
+    transactions: ['جميع المعاملات', 'سجل كامل للإيداعات والسحوبات'],
+    support: ['الدعم الفني', 'محادثات الدعم مع المستخدمين'],
+    settings: ['الإعدادات', 'إعدادات النظام واللوحة']
+  };
+  const t = titles[p] || ['', ''];
+  document.getElementById('topbarTitle').childNodes[0].nodeValue = t[0];
+  document.getElementById('topbarSub').textContent = t[1];
+
+  if (window.innerWidth <= 1024) closeSidebar();
+};
+
+window.toggleSidebar = function() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlayBg');
+  sb.classList.toggle('show');
+  ov.classList.toggle('active');
+};
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('show');
+  document.getElementById('overlayBg').classList.remove('active');
+}
+
+/* ===== TOAST ===== */
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + (type || '');
+  setTimeout(() => { t.className = ''; }, 2500);
+}
+
+/* ===== MODAL ===== */
+window.closeModal = function() {
+  document.getElementById('modalOverlay').classList.remove('active');
+};
+function openModal(title, bodyHtml, actionsHtml) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = bodyHtml;
+  document.getElementById('modalActions').innerHTML = actionsHtml || '';
+  document.getElementById('modalOverlay').classList.add('active');
+}
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) window.closeModal();
+});
+
+/* ===== HELPERS ===== */
+function fmtMoney(v) {
+  const n = parseFloat(v) || 0;
+  return '$' + n.toFixed(2);
+}
+function fmtDate(ts) {
+  if (!ts) return '—';
+  if (ts.toDate) return ts.toDate().toLocaleString('ar');
+  if (ts.seconds) return new Date(ts.seconds * 1000).toLocaleString('ar');
+  if (typeof ts === 'string') return ts;
+  return '—';
+}
+function fmtDateShort(ts) {
+  if (!ts) return '—';
+  let d;
+  if (ts.toDate) d = ts.toDate();
+  else if (ts.seconds) d = new Date(ts.seconds * 1000);
+  else if (typeof ts === 'string') return ts;
+  else return '—';
+  return d.toLocaleDateString('ar') + ' ' + d.toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' });
+}
+function isToday(ts) {
+  if (!ts) return false;
+  let d;
+  if (ts.toDate) d = ts.toDate();
+  else if (ts.seconds) d = new Date(ts.seconds * 1000);
+  else return false;
+  const now = new Date();
+  return d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+}
+function statusBadge(status) {
+  const s = (status || 'pending').toLowerCase();
+  const labels = { pending: 'معلق', approved: 'موافق عليه', rejected: 'مرفوض', active: 'نشط', blocked: 'محظور' };
+  return '<span class="badge ' + s + '">' + (labels[s] || s) + '</span>';
+}
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function truncate(str, len) {
+  if (!str) return '—';
+  str = String(str);
+  return str.length > len ? str.substring(0, len) + '...' : str;
+}
+
+/* ===== INIT ADMIN ===== */
+function initAdmin() {
+  loadDeposits();
+  loadWithdrawals();
+  loadUsers();
+  loadSupportChats();
+}
+
+/* ===== LOAD DEPOSITS ===== */
+function loadDeposits() {
+  if (unsubDeposits) { try { unsubDeposits(); } catch(e){} }
+  try {
+    const ref = collection(db, 'deposit_requests');
+    const q = query(ref, orderBy('createdAt', 'desc'));
+    unsubDeposits = onSnapshot(q, (snap) => {
+      allDeposits = [];
+      snap.forEach(d => allDeposits.push(Object.assign({ _id: d.id }, d.data())));
+      depRender();
+      updateBadges();
+      updateDashboard();
+      buildTransactions();
+    }, (err) => {
+      console.warn('deposits load error', err);
+      document.getElementById('depBody').innerHTML = '<tr><td colspan="8"><div class="empty-state"><p>تعذر تحميل البيانات</p></div></td></tr>';
+    });
+  } catch(e) { console.error(e); }
+}
+
+window.depFilter = function(v) {
+  depFilterVal = v;
+  depPage = 1;
+  document.querySelectorAll('[data-dfilter]').forEach(x => x.classList.remove('active'));
+  const el = document.querySelector('[data-dfilter="' + v + '"]');
+  if (el) el.classList.add('active');
+  depRender();
+};
+
+window.depRender = function() {
+  const body = document.getElementById('depBody');
+  if (!body) return;
+  const search = (document.getElementById('depSearch') || {}).value || '';
+  let filtered = allDeposits;
+  if (depFilterVal !== 'all') filtered = filtered.filter(r => (r.status || 'pending') === depFilterVal);
+  if (search) {
+    const s = search.toLowerCase();
+    filtered = filtered.filter(r =>
+      (r.email || '').toLowerCase().includes(s) ||
+      String(r.amount || '').includes(s)
+    );
+  }
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
+  if (depPage > totalPages) depPage = totalPages;
+  const start = (depPage - 1) * ITEMS_PER_PAGE;
+  const pageItems = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+  if (pageItems.length === 0) {
+    body.innerHTML = '<tr><td colspan="8"><div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-7 14h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg><p>لا توجد طلبات إيداع</p></div></td></tr>';
+  } else {
+    body.innerHTML = pageItems.map((r, i) => {
+      const idx = start + i + 1;
+      const isPending = (r.status || 'pending') === 'pending';
+      return '<tr>' +
+        '<td class="td-center">' + idx + '</td>' +
+        '<td class="td-email">' + escapeHtml(r.email || '—') + '</td>' +
+        '<td class="td-mono" style="color:#E8B870;font-weight:600">' + fmtMoney(r.amount) + '</td>' +
+        '<td>' + escapeHtml(r.network || '—') + '</td>' +
+        '<td class="td-mono" title="' + escapeHtml(r.address) + '">' + truncate(r.address, 14) + '</td>' +
+        '<td>' + statusBadge(r.status) + '</td>' +
+        '<td style="font-size:11px;color:#a68d7c;white-space:nowrap">' + fmtDateShort(r.createdAt) + '</td>' +
+        '<td><div class="act-btns">' +
+          (isPending ? '<button class="act-btn approve" title="موافقة" onclick="depApprove(\'' + r._id + '\')"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></button>' : '') +
+          (isPending ? '<button class="act-btn reject" title="رفض" onclick="depReject(\'' + r._id + '\')"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>' : '') +
+          '<button class="act-btn view" title="تفاصيل" onclick="depDetail(\'' + r._id + '\')"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button>' +
+          '<button class="act-btn delete" title="حذف" onclick="depDelete(\'' + r._id + '\')"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>' +
+        '</div></td>' +
+      '</tr>';
+    }).join('');
+  }
+  renderPagination('depPagination', depPage, totalPages, 'depGoTo');
+};
+
+window.depGoTo = function(p) { depPage = p; depRender(); };
+
+window.depApprove = async function(id) {
+  openModal('تأكيد الموافقة على الإيداع',
+    '<div class="confirm-icon warn"><svg viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>' +
+    '<div class="confirm-text">هل تريد الموافقة على هذا الطلب وإضافة المبلغ لمحفظة المستخدم؟</div>',
+    '<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button><button class="btn btn-gold" id="confirmDepApp">موافقة</button>'
+  );
+  document.getElementById('confirmDepApp').onclick = async function() {
+    const btn = this;
+    btn.textContent = 'جارٍ...'; btn.disabled = true;
+    try {
+      const req = allDeposits.find(r => r._id === id);
+      if (!req) { toast('الطلب غير موجود', 'error'); closeModal(); return; }
+      await updateDoc(doc(db, 'deposit_requests', id), { status: 'approved', approvedAt: serverTimestamp() });
+      /* أضف المبلغ لمحفظة المستخدم الاستثمارية */
+      if (req.uid) {
+        const uref = doc(db, 'users', req.uid);
+        const usnap = await getDoc(uref);
+        if (usnap.exists()) {
+          const ud = usnap.data() || {};
+          const cur = parseFloat(ud.investWallet) || 0;
+          await updateDoc(uref, { investWallet: cur + (parseFloat(req.amount) || 0) });
+        }
+      }
+      toast('تمت الموافقة على الإيداع بنجاح', 'success');
+      closeModal();
+    } catch(e) { console.error(e); toast('فشل التحديث', 'error'); closeModal(); }
+  };
+};
+
+window.depReject = async function(id) {
+  openModal('تأكيد رفض الإيداع',
+    '<div class="confirm-icon danger"><svg viewBox="0 0 24 24" fill="#ef4444"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5.59 7L12 14.59 6.41 9 5 10.41l7 7 7-7z"/></svg></div>' +
+    '<div class="confirm-text">هل تريد رفض طلب الإيداع هذا؟</div>',
+    '<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button><button class="btn btn-red" id="confirmDepRej">رفض الطلب</button>'
+  );
+  document.getElementById('confirmDepRej').onclick = async function() {
+    try {
+      await updateDoc(doc(db, 'deposit_requests', id), { status: 'rejected', rejectedAt: serverTimestamp() });
+      toast('تم رفض الطلب', 'success');
+      closeModal();
+    } catch(e) { toast('فشل التحديث', 'error'); closeModal(); }
+  };
+};
+
+window.depDelete = function(id) {
+  openModal('تأكيد الحذف',
+    '<div class="confirm-icon danger"><svg viewBox="0 0 24 24" fill="#ef4444"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div>' +
+    '<div class="confirm-text">سيتم حذف هذا الطلب نهائياً. لا يمكن التراجع.</div>',
+    '<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button><button class="btn btn-red" id="confirmDepDel">حذف نهائي</button>'
+  );
+  document.getElementById('confirmDepDel').onclick = async function() {
+    try {
+      await deleteDoc(doc(db, 'deposit_requests', id));
+      toast('تم حذف الطلب', 'success');
+      closeModal();
+    } catch(e) { toast('فشل الحذف', 'error'); closeModal(); }
+  };
+};
+
+window.depDetail = function(id) {
+  const r = allDeposits.find(x => x._id === id);
+  if (!r) return;
+  openModal('تفاصيل طلب الإيداع',
+    '<div class="modal-info">' +
+    '<div class="modal-info-row"><span class="lbl">المعرف:</span><span class="val td-mono">' + escapeHtml(r._id) + '</span></div>' +
+    '<div class="modal-info-row"><span class="lbl">البريد:</span><span class="val" style="direction:ltr">' + escapeHtml(r.email) + '</span></div>' +
+    '<div class="modal-info-row"><span class="lbl">UID:</span><span class="val td-mono">' + escapeHtml(r.uid) + '</span></div>' +
+    '<div class="modal-info-row"><span class="lbl">المبلغ:</span><span class="val" style="color:#E8B870">' + fmtMoney(r.amount) + '</span></div>' +
+    '<div class="modal-info-row"><span class="lbl">الشبكة:</span><span class="val">' + escapeHtml(r.network) + '</span></div>' +
+    '<div class="modal-info-row"><span class="lbl">العنوان:</span><span class="val td-mono" style="word-break:break-all;font-size:11px">' + escapeHtml(r.address) + '</span></div>' +
+    '<div class="modal-info-row"><span class="lbl">الحالة:</span>' + statusBadge(r.status) + '</div>' +
+    '<div class="modal-info-row"><span class="lbl">التاريخ:</span><span class="val" style="font-size:12px">' + fmtDate(r.createdAt) + '</span></div>' +
+    '</div>',
+    '<button class="btn btn-ghost" onclick="closeModal()">إغلاق</button>'
+  );
+};
+
+/* ===== LOAD WITHDRAWALS ===== */
+function loadWithdrawals() {
+  if (unsubWithdrawals) { try { unsubWithdrawals(); } catch(e){} }
+  try {
+    const ref = collection(db, 'withdraw_requests');
+    const q = query(ref, orderBy('createdAt', 'desc'));
+    unsubWithdrawals = onSnapshot(q, (snap) => {
+      allWithdrawals = [];
+      snap.forEach(d => allWithdrawals.push(Object.assign({ _id: d.id }, d.data())));
+      wdRender();
+      updateBadges();
+      updateDashboard();
+      buildTransactions();
+    }, (err) => {
+      console.warn('withdrawals load error', err);
+      document.getElementById('wdBody').innerHTML = '<tr><td colspan="8"><div class="empty-state"><p>تعذر تحميل البيانات</p></div></td></tr>';
+    });
+  } catch(e) { console.error(e); }
+}
+
+window.wdFilter = function(v) {
+  wdFilterVal = v;
+  wdPage = 1;
+  document.querySelectorAll('[data-wfilter]').forEach(x => x.classList.remove('active'));
+  const el = document.querySelector('[data-wfilter="' + v + '"]');
+  if (el) el.classList.add('active');
+  wdRender();
+};
+
+window.wdRender = function() {
+  const body = document.getElementById('wdBody');
+  if (!body) return;
+  const search = (document.getElementById('wdSearch') || {}).value || '';
+  let filtered = allWithdrawals;
+  if (wdFilterVal !== 'all') filtered = filtered.filter(r => (r.status || 'pending') === wdFilterVal);
+  if (search) {
+    const s = search.toLowerCase();
+    filtered = filtered.filter(r =>
+      (r.email || '').toLowerCase().includes(s) ||
+      String(r.amount || '').includes(s)
+    );
+  }
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
+  if (wdPage > totalPages) wdPage = totalPages;
+  const start = (wdPage - 1) * ITEMS_PER_PAGE;
+  const pageItems = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+  if (pageItems.length === 0) {
+    body.innerHTML = '<tr><td colspan="8"><div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-7 14h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg><p>لا توجد طلبات سحب</p></div></td></tr>';
+  } else {
+    body.innerHTML = pageItems.map((r, i) => {
+      const idx = start + i + 1;
+      const isPending = (r.status || 'pending') === 'pending';
+      return '<tr>' +
+        '<td class="td-center">' + idx + '</td>' +
+        '<td class="td-email">' + escapeHtml(r.email || '—') + '</td>' +
+        '<td class="td-mono" style="color:#ef4444;font-weight:600">' + fmtMoney(r.amount) + '</td>' +
+        '<td>' + escapeHtml(r.network || '—') + '</td>' +
+        '<td class="td-mono" title="' + escapeHtml(r.address) + '">' + truncate(r.address, 14) + '</td>' +
+        '<td>' + statusBadge(r.status) + '</td>' +
+        '<td style="font-size:11px;color:#a68d7c;white-space:nowrap">' + fmtDateShort(r.createdAt) + '</td>' +
+        '<td><div class="act-btns">' +
+          (isPending ? '<button class="act-btn approve" title="موافقة" onclick="wdApprove(\'' + r._id + '\')"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></button>' : '') +
+          (isPending ? '<button class="act-btn reject" title="رفض" onclick="wdReject(\'' + r._id + '\')"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>' : '') +
+          '<button class="act-btn view" title="تفاصيل" onclick="wdDetail(\'' + r._id + '\')"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button>' +
+          '<button class="act-btn delete" title="حذف" onclick="wdDelete(\'' + r._id + '\')"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>' +
+        '</div></td>' +
+      '</tr>';
+    }).join('');
+  }
+  renderPagination('wdPagination', wdPage, totalPages, 'wdGoTo');
+};
+
+window.wdGoTo = function(p) { wdPage = p; wdRender(); };
+
+window.wdApprove = function(id) {
+  openModal('تأكيد الموافقة على السحب',
+    '<div class="confirm-icon warn"><svg viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>' +
+    '<div class="confirm-text">هل تريد الموافقة على طلب السحب وخصم المبلغ من رصيد المستخدم؟</div>',
+    '<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button><button class="btn btn-gold" id="confirmWdApp">موافقة</button>'
+  );
+  document.getElementById('confirmWdApp').onclick = async function() {
+    const btn = this;
+    btn.textContent = 'جارٍ...'; btn.disabled = true;
+    try {
+      const req = allWithdrawals.find(r => r._id === id);
+      if (!req) { toast('الطلب غير موجود', 'error'); closeModal(); return; }
+      await updateDoc(doc(db, 'withdraw_requests', id), { status: 'approved', approvedAt: serverTimestamp() });
+      if (req.uid) {
+        const uref = doc(db, 'users', req.uid);
+        const usnap = await getDoc(uref);
+        if (usnap.exists()) {
+          const ud = usnap.data() || {};
+          const cur = parseFloat(ud.investWallet) || 0;
+          const amt = parseFloat(req.amount) || 0;
+          const newBal = Math.max(0, cur - amt);
+          await updateDoc(uref, { investWallet: newBal });
+        }
+      }
+      toast('تمت الموافقة على السحب بنجاح', 'success');
+      closeModal();
+    } catch(e) { console.error(e); toast('فشل التحديث', 'error'); closeModal(); }
+  };
+};
+
+window.wdReject = function(id) {
+  openModal('تأكيد رفض السحب',
+    '<div class="confirm-icon danger"><svg viewBox="0 0 24 24" fill="#ef4444"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5.59 7L12 14.59 6.41 9 5 10.41l7 7 7-7z"/></svg></div>' +
+    '<div class="confirm-text">هل تريد رفض طلب السحب هذا؟</div>',
+    '<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button><button class="btn btn-red" id="confirmWdRej">رفض الطلب</button>'
+  );
+  document.getElementById('confirmWdRej').onclick = async function() {
+    try {
+      await updateDoc(doc(db, 'withdraw_requests', id), { status: 'rejected', rejectedAt: serverTimestamp() });
+      toast('تم رفض الطلب', 'success');
+      closeModal();
+    } catch(e) { toast('فشل التحديث', 'error'); closeModal(); }
+  };
+};
+
+window.wdDelete = function(id) {
+  openModal('تأكيد الحذف',
+    '<div class="confirm-icon danger"><svg viewBox="0 0 24 24" fill="#ef4444"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div>' +
+    '<div class="confirm-text">سيتم حذف هذا الطلب نهائياً. لا يمكن التراجع.</div>',
+    '<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button><button class="btn btn-red" id="confirmWdDel">حذف نهائي</button>'
+  );
+  document.getElementById('confirmWdDel').onclick = async function() {
+    try {
+      await deleteDoc(doc(db, 'withdraw_requests', id));
+      toast('تم حذف الطلب', 'success');
+      closeModal();
+    } catch(e) { toast('فشل الحذف', 'error'); closeModal(); }
+  };
+};
+
+window.wdDetail = function(id) {
+  const r = allWithdrawals.find(x => x._id === id);
+  if (!r) return;
+  openModal('تفاصيل طلب السحب',
+    '<div class="modal-info">' +
+    '<div class="modal-info-row"><span class="lbl">المعرف:</span><span class="val td-mono">' + escapeHtml(r._id) + '</span></div>' +
+    '<div class="modal-info-row"><span class="lbl">البريد:</span><span class="val" style="direction:ltr">' + escapeHtml(r.email) + '</span></div>' +
+    '<div class="modal-info-row"><span class="lbl">UID:</span><span class="val td-mono">' + escapeHtml(r.uid) + '</span></div>' +
+    '<div class="modal-info-row"><span class="lbl">المبلغ:</span><span class="val" style="color:#ef4444">' + fmtMoney(r.amount) + '</span></div>' +
+    '<div class="modal-info-row"><span class="lbl">الشبكة:</span><span class="val">' + escapeHtml(r.network) + '</span></div>' +
+    '<div class="modal-info-row"><span class="lbl">العنوان:</span><span class="val td-mono" style="word-break:break-all;font-size:11px">' + escapeHtml(r.address) + '</span></div>' +
+    '<div class="modal-info-row"><span class="lbl">الحالة:</span>' + statusBadge(r.status) + '</div>' +
+    '<div class="modal-info-row"><span class="lbl">التاريخ:</span><span class="val" style="font-size:12px">' + fmtDate(r.createdAt) + '</span></div>' +
+    '</div>',
+    '<button class="btn btn-ghost" onclick="closeModal()">إغلاق</button>'
+  );
+};
+
+/* ===== LOAD USERS ===== */
+function loadUsers() {
+  if (unsubUsers) { try { unsubUsers(); } catch(e){} }
+  try {
+    const ref = collection(db, 'users');
+    unsubUsers = onSnapshot(ref, (snap) => {
+      allUsers = [];
+      snap.forEach(d => allUsers.push(Object.assign({ _id: d.id }, d.data())));
+      usrRender();
+      updateBadges();
+      updateDashboard();
+    }, (err) => {
+      console.warn('users load error', err);
+      document.getElementById('usrBody').innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>تعذر تحميل البيانات</p></div></td></tr>';
+    });
+  } catch(e) { console.error(e); }
+}
+
+window.usrFilter = function(v) {
+  usrFilterVal = v;
+  usrPage = 1;
+  document.querySelectorAll('[data-ufilter]').forEach(x => x.classList.remove('active'));
+  const el = document.querySelector('[data-ufilter="' + v + '"]');
+  if (el) el.classList.add('active');
+  usrRender();
+};
+
+window.usrRender = function() {
+  const body = document.getElementById('usrBody');
+  if (!body) return;
+  const search = (document.getElementById('usrSearch') || {}).value || '';
+  let filtered = allUsers;
+  if (usrFilterVal === 'active') filtered = filtered.filter(u => (u.status || 'active') === 'active');
+  if (usrFilterVal === 'blocked') filtered = filtered.filter(u => u.status === 'blocked');
+  if (search) {
+    const s = search.toLowerCase();
+    filtered = filtered.filter(u =>
+      (u.email || '').toLowerCase().includes(s) ||
+      (u._id || '').toLowerCase().includes(s)
+    );
+  }
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
+  if (usrPage > totalPages) usrPage = totalPages;
+  const start = (usrPage - 1) * ITEMS_PER_PAGE;
+  const pageItems = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+  if (pageItems.length === 0) {
+    body.innerHTML = '<tr><td colspan="7"><div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3z"/></svg><p>لا يوجد مستخدمون</p></div></td></tr>';
+  } else {
+    body.innerHTML = pageItems.map((u, i) => {
+      const idx = start + i + 1;
+      const isBlocked = u.status === 'blocked';
+      return '<tr>' +
+        '<td class="td-center">' + idx + '</td>' +
+        '<td class="td-email">' + escapeHtml(u.email || '—') + '</td>' +
+        '<td class="td-mono" style="color:#E8B870">' + fmtMoney(u.investWallet) + '</td>' +
+        '<td class="td-mono" style="color:#4ade80">' + fmtMoney(u.commWallet) + '</td>' +
+        '<td>' + statusBadge(u.status || 'active') + '</td>' +
+        '<td style="font-size:11px;color:#a68d7c;white-space:nowrap">' + fmtDateShort(u.createdAt) + '</td>' +
+        '<td><div class="act-btns">' +
+          '<button class="act-btn view" title="تفاصيل" onclick="usrDetail(\'' + u._id + '\')"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button>' +
+          '<button class="act-btn edit" title="تعديل الأرصدة" onclick="usrEdit(\'' + u._id + '\')"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button>' +
+          (isBlocked
+            ? '<button class="act-btn approve" title="إلغاء الحظر" onclick="usrUnblock(\'' + u._id + '\')"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></button>'
+            : '<button class="act-btn block" title="حظر" onclick="usrBlock(\'' + u._id + '\')"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 4.63 10.15 4 12 4c4.41 0 8 3.59 8 8 0 1.85-.63 3.55-1.69 4.9z"/></svg></button>'
+          ) +
+          '<button class="act-btn delete" title="حذف" onclick="usrDelete(\'' + u._id + '\')"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>' +
+        '</div></td>' +
+      '</tr>';
+    }).join('');
+  }
+  renderPagination('usrPagination', usrPage, totalPages, 'usrGoTo');
+};
+
+window.usrGoTo = function(p) { usrPage = p; usrRender(); };
+
+window.usrDetail = function(id) {
+  const u = allUsers.find(x => x._id === id);
+  if (!u) return;
+  openModal('تفاصيل المستخدم',
+    '<div class="ud-section">' +
+    '<div class="ud-section-title">المعلومات الأساسية</div>' +
+    '<div class="ud-grid">' +
+    '<div class="ud-item"><div class="lbl">UID</div><div class="val td-mono" style="font-size:11px;word-break:break-all">' + escapeHtml(u._id) + '</div></div>' +
+    '<div class="ud-item"><div class="lbl">البريد</div><div class="val" style="direction:ltr;font-size:12px">' + escapeHtml(u.email || '—') + '</div></div>' +
+    '<div class="ud-item"><div class="lbl">الحالة</div><div class="val">' + statusBadge(u.status || 'active') + '</div></div>' +
+    '<div class="ud-item"><div class="lbl">تاريخ التسجيل</div><div class="val" style="font-size:12px">' + fmtDate(u.createdAt) + '</div></div>' +
+    '</div></div>' +
+    '<div class="ud-section">' +
+    '<div class="ud-section-title">الأرصدة المالية</div>' +
+    '<div class="ud-grid">' +
+    '<div class="ud-item"><div class="lbl">المحفظة الاستثمارية</div><div class="val" style="color:#E8B870">' + fmtMoney(u.investWallet) + '</div></div>' +
+    '<div class="ud-item"><div class="lbl">محفظة العمولات</div><div class="val" style="color:#4ade80">' + fmtMoney(u.commWallet) + '</div></div>' +
+    '<div class="ud-item"><div class="lbl">الحساب الكمي</div><div class="val">' + fmtMoney(u.quantAcc) + '</div></div>' +
+    '<div class="ud-item"><div class="lbl">الحساب الذكي</div><div class="val">' + fmtMoney(u.smartAcc) + '</div></div>' +
+    '<div class="ud-item"><div class="lbl">أصول الربح</div><div class="val">' + fmtMoney(u.profitAssets) + '</div></div>' +
+    '<div class="ud-item"><div class="lbl">رمز الأمان</div><div class="val" style="direction:ltr">' + escapeHtml(u.securityPin || '—') + '</div></div>' +
+    '</div></div>' +
+    '<div class="ud-section">' +
+    '<div class="ud-section-title">الأرباح</div>' +
+    '<div class="ud-grid">' +
+    '<div class="ud-item"><div class="lbl">أرباح الأمس</div><div class="val">' + fmtMoney(u.yesterdayProfit) + '</div></div>' +
+    '<div class="ud-item"><div class="lbl">أرباح اليوم</div><div class="val">' + fmtMoney(u.todayProfit) + '</div></div>' +
+    '<div class="ud-item"><div class="lbl">عمولة اليوم</div><div class="val">' + fmtMoney(u.todayComm) + '</div></div>' +
+    '</div></div>',
+    '<button class="btn btn-ghost" onclick="closeModal()">إغلاق</button>' +
+    '<button class="btn btn-gold" onclick="closeModal();usrEdit(\'' + u._id + '\')">تعديل الأرصدة</button>'
+  );
+};
+
+window.usrEdit = function(id) {
+  const u = allUsers.find(x => x._id === id);
+  if (!u) return;
+  openModal('تعديل أرصدة المستخدم',
+    '<div class="modal-info" style="margin-bottom:16px"><div class="modal-info-row"><span class="lbl">المستخدم:</span><span class="val" style="direction:ltr">' + escapeHtml(u.email || '—') + '</span></div></div>' +
+    '<div class="modal-field-row">' +
+    '<div class="modal-field"><label>المحفظة الاستثمارية</label><input type="number" step="0.01" id="edInvest" value="' + (parseFloat(u.investWallet) || 0) + '"></div>' +
+    '<div class="modal-field"><label>محفظة العمولات</label><input type="number" step="0.01" id="edComm" value="' + (parseFloat(u.commWallet) || 0) + '"></div>' +
+    '</div>' +
+    '<div class="modal-field-row">' +
+    '<div class="modal-field"><label>الحساب الكمي</label><input type="number" step="0.01" id="edQuant" value="' + (parseFloat(u.quantAcc) || 0) + '"></div>' +
+    '<div class="modal-field"><label>الحساب الذكي</label><input type="number" step="0.01" id="edSmart" value="' + (parseFloat(u.smartAcc) || 0) + '"></div>' +
+    '</div>' +
+    '<div class="modal-field-row">' +
+    '<div class="modal-field"><label>أصول الربح</label><input type="number" step="0.01" id="edProfit" value="' + (parseFloat(u.profitAssets) || 0) + '"></div>' +
+    '<div class="modal-field"><label>أرباح اليوم</label><input type="number" step="0.01" id="edTodayP" value="' + (parseFloat(u.todayProfit) || 0) + '"></div>' +
+    '</div>',
+    '<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button><button class="btn btn-gold" id="confirmUsrEdit">حفظ التعديلات</button>'
+  );
+  document.getElementById('confirmUsrEdit').onclick = async function() {
+    const btn = this;
+    btn.textContent = 'جارٍ الحفظ...'; btn.disabled = true;
+    try {
+      const updates = {
+        investWallet: parseFloat(document.getElementById('edInvest').value) || 0,
+        commWallet: parseFloat(document.getElementById('edComm').value) || 0,
+        quantAcc: parseFloat(document.getElementById('edQuant').value) || 0,
+        smartAcc: parseFloat(document.getElementById('edSmart').value) || 0,
+        profitAssets: parseFloat(document.getElementById('edProfit').value) || 0,
+        todayProfit: parseFloat(document.getElementById('edTodayP').value) || 0
+      };
+      await updateDoc(doc(db, 'users', id), updates);
+      toast('تم حفظ التعديلات بنجاح', 'success');
+      closeModal();
+    } catch(e) { console.error(e); toast('فشل الحفظ', 'error'); closeModal(); }
+  };
+};
+
+window.usrBlock = function(id) {
+  openModal('تأكيد حظر المستخدم',
+    '<div class="confirm-icon danger"><svg viewBox="0 0 24 24" fill="#ef4444"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 4.63 10.15 4 12 4c4.41 0 8 3.59 8 8 0 1.85-.63 3.55-1.69 4.9z"/></svg></div>' +
+    '<div class="confirm-text">سيتم حظر هذا المستخدم. لن يتمكن من الدخول للموقع.</div>',
+    '<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button><button class="btn btn-red" id="confirmUsrBlock">حظر</button>'
+  );
+  document.getElementById('confirmUsrBlock').onclick = async function() {
+    try {
+      await updateDoc(doc(db, 'users', id), { status: 'blocked' });
+      toast('تم حظر المستخدم', 'success');
+      closeModal();
+    } catch(e) { toast('فشل الحظر', 'error'); closeModal(); }
+  };
+};
+
+window.usrUnblock = function(id) {
+  openModal('إلغاء حظر المستخدم',
+    '<div class="confirm-icon warn"><svg viewBox="0 0 24 24" fill="#4ade80"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>' +
+    '<div class="confirm-text">سيتم إلغاء حظر هذا المستخدم والسماح له بالدخول.</div>',
+    '<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button><button class="btn btn-gold" id="confirmUsrUnblock">إلغاء الحظر</button>'
+  );
+  document.getElementById('confirmUsrUnblock').onclick = async function() {
+    try {
+      await updateDoc(doc(db, 'users', id), { status: 'active' });
+      toast('تم إلغاء الحظر', 'success');
+      closeModal();
+    } catch(e) { toast('فشل', 'error'); closeModal(); }
+  };
+};
+
+window.usrDelete = function(id) {
+  openModal('تأكيد حذف المستخدم',
+    '<div class="confirm-icon danger"><svg viewBox="0 0 24 24" fill="#ef4444"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div>' +
+    '<div class="confirm-text">سيتم حذف بيانات هذا المستخدم نهائياً من قاعدة البيانات.</div>' +
+    '<div class="confirm-sub">لا يمكن التراجع عن هذا الإجراء.</div>',
+    '<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button><button class="btn btn-red" id="confirmUsrDel">حذف نهائي</button>'
+  );
+  document.getElementById('confirmUsrDel').onclick = async function() {
+    try {
+      await deleteDoc(doc(db, 'users', id));
+      toast('تم حذف المستخدم', 'success');
+      closeModal();
+    } catch(e) { toast('فشل الحذف', 'error'); closeModal(); }
+  };
+};
+
+/* ===== TRANSACTIONS (combined) ===== */
+function buildTransactions() {
+  const deps = allDeposits.map(r => ({ type: 'deposit', _id: r._id, email: r.email, amount: r.amount, network: r.network, status: r.status, createdAt: r.createdAt }));
+  const wds  = allWithdrawals.map(r => ({ type: 'withdraw', _id: r._id, email: r.email, amount: r.amount, network: r.network, status: r.status, createdAt: r.createdAt }));
+  allTransactions = deps.concat(wds).sort((a, b) => {
+    const ta = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+    const tb = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+    return tb - ta;
+  });
+  txRender();
+}
+
+window.txFilter = function(v) {
+  txFilterVal = v;
+  txPage = 1;
+  document.querySelectorAll('[data-tfilter]').forEach(x => x.classList.remove('active'));
+  const el = document.querySelector('[data-tfilter="' + v + '"]');
+  if (el) el.classList.add('active');
+  txRender();
+};
+
+window.txRender = function() {
+  const body = document.getElementById('txBody');
+  if (!body) return;
+  const search = (document.getElementById('txSearch') || {}).value || '';
+  let filtered = allTransactions;
+  if (txFilterVal === 'deposit') filtered = filtered.filter(t => t.type === 'deposit');
+  if (txFilterVal === 'withdraw') filtered = filtered.filter(t => t.type === 'withdraw');
+  if (search) {
+    const s = search.toLowerCase();
+    filtered = filtered.filter(t =>
+      (t.email || '').toLowerCase().includes(s) ||
+      String(t.amount || '').includes(s)
+    );
+  }
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
+  if (txPage > totalPages) txPage = totalPages;
+  const start = (txPage - 1) * ITEMS_PER_PAGE;
+  const pageItems = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+  if (pageItems.length === 0) {
+    body.innerHTML = '<tr><td colspan="7"><div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.89-2-2-2z"/></svg><p>لا توجد معاملات</p></div></td></tr>';
+  } else {
+    body.innerHTML = pageItems.map((t, i) => {
+      const idx = start + i + 1;
+      const typeLabel = t.type === 'deposit' ? 'إيداع' : 'سحب';
+      const typeColor = t.type === 'deposit' ? '#E8B870' : '#ef4444';
+      return '<tr>' +
+        '<td class="td-center">' + idx + '</td>' +
+        '<td style="color:' + typeColor + ';font-weight:600">' + typeLabel + '</td>' +
+        '<td class="td-email">' + escapeHtml(t.email || '—') + '</td>' +
+        '<td class="td-mono" style="color:' + typeColor + '">' + fmtMoney(t.amount) + '</td>' +
+        '<td>' + escapeHtml(t.network || '—') + '</td>' +
+        '<td>' + statusBadge(t.status) + '</td>' +
+        '<td style="font-size:11px;color:#a68d7c;white-space:nowrap">' + fmtDateShort(t.createdAt) + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+  renderPagination('txPagination', txPage, totalPages, 'txGoTo');
+};
+
+window.txGoTo = function(p) { txPage = p; txRender(); };
+
+/* ===== SUPPORT CHATS ===== */
+async function loadSupportChats() {
+  try {
+    const ref = collection(db, 'support_chats');
+    const snap = await getDocs(ref);
+    allSupport = [];
+    snap.forEach(d => {
+      const data = d.data();
+      allSupport.push(Object.assign({ _id: d.id }, data));
+    });
+    supportRender();
+  } catch(e) { console.warn('support load error', e); }
+}
+
+function supportRender() {
+  const body = document.getElementById('supportBody');
+  if (!body) return;
+  if (allSupport.length === 0) {
+    body.innerHTML = '<tr><td colspan="6"><div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg><p>لا توجد محادثات دعم</p></div></td></tr>';
+    return;
+  }
+  allSupport.sort((a, b) => {
+    const ta = a.lastUpdate && a.lastUpdate.seconds ? a.lastUpdate.seconds : 0;
+    const tb = b.lastUpdate && b.lastUpdate.seconds ? b.lastUpdate.seconds : 0;
+    return tb - ta;
+  });
+  body.innerHTML = allSupport.map((s, i) => {
+    return '<tr>' +
+      '<td class="td-center">' + (i + 1) + '</td>' +
+      '<td class="td-email">' + escapeHtml(s.email || s._id || '—') + '</td>' +
+      '<td style="font-size:12px;color:#e0cfc3">' + escapeHtml(truncate(s.lastMessage || '—', 40)) + '</td>' +
+      '<td class="td-center td-mono">' + (s.messageCount || 0) + '</td>' +
+      '<td style="font-size:11px;color:#a68d7c;white-space:nowrap">' + fmtDateShort(s.lastUpdate || s.createdAt) + '</td>' +
+      '<td><div class="act-btns"><button class="act-btn view" title="عرض المحادثة" onclick="supportView(\'' + s._id + '\')"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button>' +
+      '<button class="act-btn delete" title="حذف المحادثة" onclick="supportDelete(\'' + s._id + '\')"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></div></td>' +
+    '</tr>';
+  }).join('');
+}
+
+window.supportView = async function(chatId) {
+  try {
+    const msgsRef = collection(db, 'support_chats', chatId, 'messages');
+    const q = query(msgsRef, orderBy('createdAt', 'asc'));
+    const snap = await getDocs(q);
+    let msgs = [];
+    snap.forEach(d => msgs.push(d.data()));
+    let html = '<div style="max-height:400px;overflow-y:auto;padding:10px;background:#22160f;border-radius:12px;display:flex;flex-direction:column;gap:8px">';
+    if (msgs.length === 0) {
+      html += '<div style="text-align:center;color:#8a7a75;padding:30px">لا توجد رسائل</div>';
+    } else {
+      msgs.forEach(m => {
+        const isUser = m.sender === 'user' || !m.sender;
+        const bg = isUser ? 'rgba(74,222,128,.15)' : 'rgba(232,184,112,.15)';
+        const align = isUser ? 'flex-start' : 'flex-end';
+        const senderLabel = isUser ? 'مستخدم' : 'إدارة';
+        html += '<div style="align-self:' + align + ';max-width:80%;background:' + bg + ';border-radius:12px;padding:10px 14px"><div style="font-size:10px;color:#a68d7c;margin-bottom:4px">' + senderLabel + ' · ' + fmtDateShort(m.createdAt) + '</div><div style="font-size:13px;color:#e0cfc3;line-height:1.5">' + escapeHtml(m.text || m.message || '') + '</div></div>';
+      });
+    }
+    html += '</div>';
+    openModal('محادثة الدعم', html, '<button class="btn btn-ghost" onclick="closeModal()">إغلاق</button>');
+  } catch(e) { console.error(e); toast('فشل تحميل المحادثة', 'error'); }
+};
+
+window.supportDelete = function(id) {
+  openModal('حذف المحادثة',
+    '<div class="confirm-icon danger"><svg viewBox="0 0 24 24" fill="#ef4444"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div>' +
+    '<div class="confirm-text">سيتم حذف هذه المحادثة نهائياً.</div>',
+    '<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button><button class="btn btn-red" id="confirmSupDel">حذف</button>'
+  );
+  document.getElementById('confirmSupDel').onclick = async function() {
+    try {
+      await deleteDoc(doc(db, 'support_chats', id));
+      toast('تم حذف المحادثة', 'success');
+      closeModal();
+      loadSupportChats();
+    } catch(e) { toast('فشل الحذف', 'error'); closeModal(); }
+  };
+};
+
+/* ===== DASHBOARD STATS ===== */
+function updateDashboard() {
+  const totalDep = allDeposits.filter(r => r.status === 'approved').reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
+  const totalWd  = allWithdrawals.filter(r => r.status === 'approved').reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
+  const pendingDep = allDeposits.filter(r => (r.status || 'pending') === 'pending').length;
+  const pendingWd  = allWithdrawals.filter(r => (r.status || 'pending') === 'pending').length;
+  const totalPending = pendingDep + pendingWd;
+  const totalUsers = allUsers.length;
+  const activeUsers = allUsers.filter(u => (u.status || 'active') === 'active').length;
+  const todayDep = allDeposits.filter(r => isToday(r.createdAt)).reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
+  const todayWd  = allWithdrawals.filter(r => isToday(r.createdAt)).reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
+  const todayDepCount = allDeposits.filter(r => isToday(r.createdAt)).length;
+  const todayWdCount  = allWithdrawals.filter(r => isToday(r.createdAt)).length;
+  const todayUsers = allUsers.filter(u => isToday(u.createdAt)).length;
+  const netRevenue = totalDep - totalWd;
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('stTotalDep', fmtMoney(totalDep));
+  set('stTotalWd', fmtMoney(totalWd));
+  set('stDepCount', allDeposits.length + ' طلب');
+  set('stWdCount', allWithdrawals.length + ' طلب');
+  set('stTotalUsers', totalUsers);
+  set('stActiveUsers', activeUsers + ' نشط');
+  set('stPending', totalPending);
+  set('stPendingFoot', pendingDep + ' إيداع / ' + pendingWd + ' سحب');
+  set('stNetRevenue', fmtMoney(netRevenue));
+  set('stTodayDep', fmtMoney(todayDep));
+  set('stTodayWd', fmtMoney(todayWd));
+  set('stTodayDepCount', todayDepCount + ' اليوم');
+  set('stTodayWdCount', todayWdCount + ' اليوم');
+  set('stTodayUsers', todayUsers);
+
+  /* Recent transactions (top 10) */
+  const recentBody = document.getElementById('recentTxBody');
+  if (recentBody) {
+    const recent = allTransactions.slice(0, 10);
+    if (recent.length === 0) {
+      recentBody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>لا توجد معاملات</p></div></td></tr>';
+    } else {
+      recentBody.innerHTML = recent.map(t => {
+        const typeLabel = t.type === 'deposit' ? 'إيداع' : 'سحب';
+        const typeColor = t.type === 'deposit' ? '#E8B870' : '#ef4444';
+        return '<tr>' +
+          '<td style="color:' + typeColor + ';font-weight:600">' + typeLabel + '</td>' +
+          '<td class="td-email">' + escapeHtml(t.email || '—') + '</td>' +
+          '<td class="td-mono" style="color:' + typeColor + '">' + fmtMoney(t.amount) + '</td>' +
+          '<td>' + escapeHtml(t.network || '—') + '</td>' +
+          '<td>' + statusBadge(t.status) + '</td>' +
+          '<td style="font-size:11px;color:#a68d7c;white-space:nowrap">' + fmtDateShort(t.createdAt) + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+  }
+}
+
+/* ===== BADGES ===== */
+function updateBadges() {
+  const pendingDep = allDeposits.filter(r => (r.status || 'pending') === 'pending').length;
+  const pendingWd  = allWithdrawals.filter(r => (r.status || 'pending') === 'pending').length;
+  const totalUsers = allUsers.length;
+
+  const depBadge = document.getElementById('depBadge');
+  const wdBadge  = document.getElementById('wdBadge');
+  const usrBadge = document.getElementById('usrBadge');
+
+  if (depBadge) { if (pendingDep > 0) { depBadge.textContent = pendingDep; depBadge.style.display = 'inline-block'; } else depBadge.style.display = 'none'; }
+  if (wdBadge)  { if (pendingWd > 0)  { wdBadge.textContent = pendingWd; wdBadge.style.display = 'inline-block'; } else wdBadge.style.display = 'none'; }
+  if (usrBadge) { if (totalUsers > 0) { usrBadge.textContent = totalUsers; usrBadge.style.display = 'inline-block'; } else usrBadge.style.display = 'none'; }
+}
+
+/* ===== PAGINATION ===== */
+function renderPagination(containerId, cur, total, fnName) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (total <= 1) { el.innerHTML = ''; return; }
+  let html = '';
+  html += '<button class="pg-btn" onclick="' + fnName + '(' + Math.max(1, cur - 1) + ')" ' + (cur <= 1 ? 'disabled' : '') + '>‹</button>';
+  const maxVisible = 5;
+  let startP = Math.max(1, cur - Math.floor(maxVisible / 2));
+  let endP = Math.min(total, startP + maxVisible - 1);
+  if (endP - startP < maxVisible - 1) startP = Math.max(1, endP - maxVisible + 1);
+  if (startP > 1) { html += '<button class="pg-btn" onclick="' + fnName + '(1)">1</button>'; if (startP > 2) html += '<span class="pg-btn" style="border:none;background:none">...</span>'; }
+  for (let p = startP; p <= endP; p++) {
+    html += '<button class="pg-btn' + (p === cur ? ' active' : '') + '" onclick="' + fnName + '(' + p + ')">' + p + '</button>';
+  }
+  if (endP < total) { if (endP < total - 1) html += '<span class="pg-btn" style="border:none;background:none">...</span>'; html += '<button class="pg-btn" onclick="' + fnName + '(' + total + ')">' + total + '</button>'; }
+  html += '<button class="pg-btn" onclick="' + fnName + '(' + Math.min(total, cur + 1) + ')" ' + (cur >= total ? 'disabled' : '') + '>›</button>';
+  el.innerHTML = html;
+}
+
+/* ===== SETTINGS ===== */
+window.refreshAll = function() {
+  toast('جارٍ تحديث البيانات...', 'success');
+  loadDeposits();
+  loadWithdrawals();
+  loadUsers();
+  loadSupportChats();
+};
+
+window.exportData = function() {
+  const data = {
+    deposits: allDeposits,
+    withdrawals: allWithdrawals,
+    users: allUsers.map(u => { delete u.securityPin; return u; }),
+    transactions: allTransactions,
+    exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'creftx-export-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('تم تصدير البيانات', 'success');
+};
+
+/* Auto-refresh support every 30s */
+setInterval(() => { if (currentPage === 'support') loadSupportChats(); }, 30000);
+</script>
+</body>
+</html>
