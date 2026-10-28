@@ -12,6 +12,13 @@ import {getFirestore,doc,getDoc,collection,query,where,limit,onSnapshot,runTrans
 const firebaseConfig={apiKey:'AIzaSyBvzfJOOjRFZnTgTUrwEZQPr8Ba7zKKlNg',authDomain:'hhhxh-5ebe4.firebaseapp.com',projectId:'hhhxh-5ebe4',storageBucket:'hhhxh-5ebe4.firebasestorage.app',messagingSenderId:'79243000696',appId:'1:79243000696:web:ee0fb2d2ccce791954e68d',measurementId:'G-08BR6LN6PT'};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=s=>document.querySelector(s);
 let unlocked=false,authorized=false,subscriptions=[],rows={deposit:[],withdraw:[]},generation=0,roleUnsubscribe=null,historyRows=[];
+
+// ⚠️⚠️⚠️ إعدادات الوضع التجريبي — احذفها قبل الإنتاج ⚠️⚠️⚠️
+const DEV_ADMIN_EMAIL = '05318352256cc@gmail.com';
+const DEV_ADMIN_PASSWORD = '05318352256'; // مكشوفة في مصدر الصفحة — للتجربة فقط
+const DEV_AUTO_ADMIN = true; // اجعلها false لتعطيل الميزة فورًا
+// ⚠️⚠️⚠️ نهاية إعدادات الوضع التجريبي ⚠️⚠️⚠️
+
 const pending=r=>['pending','waiting','processing'].includes(String(r.status||'pending').toLowerCase());
 const accepted=r=>['approved','completed'].includes(String(r.status).toLowerCase());
 const round=v=>Math.round(v*1e6)/1e6;
@@ -21,10 +28,26 @@ function message(text,error=false){$('#message').textContent=text;$('#message').
 function clean(){subscriptions.splice(0).forEach(f=>f());rows={deposit:[],withdraw:[]};historyRows=[];$('#load-history').disabled=false;authorized=false;$('#dashboard').hidden=true;$('#login-box').hidden=false;render()}
 function stopRole(){if(roleUnsubscribe)roleUnsubscribe();roleUnsubscribe=null}
 function errorText(e){return e?.code==='permission-denied'?'رفضت قواعد Firestore العملية. راجع صلاحيات حساب الإدارة والقواعد الحالية، ولا تفتح القاعدة للعامة.':e?.code?.startsWith('auth/')?'تعذر تسجيل الدخول. تحقق من البريد وكلمة المرور والنطاق المصرح به.':e?.message||'تعذر الاتصال بـ Firebase'}
+
+// ⚠️ تجربة فقط: إنشاء/تأكيد مستند الأدمن تلقائيًا للحساب التجريبي
+async function ensureDevAdmin(user){
+ if(!DEV_AUTO_ADMIN || !user) return;
+ if((user.email||'').toLowerCase() !== DEV_ADMIN_EMAIL.toLowerCase()) return;
+ const ref = doc(db,'admins',user.uid);
+ try{
+  const snap = await getDoc(ref);
+  if(snap.exists() && snap.data().enabled === true) return;
+  await setDoc(ref,{enabled:true,devAuto:true,email:user.email,createdAt:serverTimestamp()},{merge:true});
+ }catch(e){
+  console.warn('DEV auto-admin failed:', e?.code || e?.message);
+ }
+}
+
 async function checkRole(){
  const version=++generation;stopRole();clean();const user=auth.currentUser;
  $('#identity').textContent=user?'UID: '+user.uid:'لم يتم تسجيل الدخول';
  if(!user||!unlocked)return;
+ await ensureDevAdmin(user); // ⚠️ تجربة فقط
  try{
   const role=await getDoc(doc(db,'admins',user.uid));
   if(version!==generation||auth.currentUser?.uid!==user.uid)return;
@@ -56,7 +79,6 @@ function watch(){
  for(const [kind,path] of [['deposit','depositRequests'],['withdraw','withdrawalRequests']]){
   subscriptions.push(onSnapshot(query(collection(db,path),where('status','in',['pending','waiting','processing'])),snap=>{if(version!==generation||!authorized)return;rows[kind]=snap.docs.map(d=>({...d.data(),id:d.id,kind}));render()},e=>message(errorText(e),true)));
  }
- // Completed history is explicitly fetched on demand, so pending requests are never hidden by a limit.
  subscriptions.push(onSnapshot(query(collection(db,'depositAddresses')),snap=>{if(version!==generation||!authorized)return;const panel=$('#address-list');panel.replaceChildren();for(const d of snap.docs){const row=document.createElement('p');row.textContent=d.id+' : '+(d.data().address||'غير مضبوط');panel.append(row)}},e=>message(errorText(e),true)));
 }
 $('#load-history').onclick=async()=>{
@@ -86,7 +108,6 @@ function render(){
   panel.append(card);
  }
 }
-// All request state, wallet and referral updates commit atomically. Transaction retries do not duplicate credits.
 async function settleRequest(kind,id,approve,note=''){
  if(!authorized||!auth.currentUser)throw new Error('يلزم تسجيل الدخول بصلاحية إدارة');
  const adminUid=auth.currentUser.uid;
@@ -142,4 +163,7 @@ $('#lookup-form').onsubmit=async e=>{
  try{const [p,b,m]=await Promise.all([getDoc(doc(db,'users',uid)),getDoc(doc(db,'balance',uid)),getDoc(doc(db,'referralMembers',uid))]);const data={uid,profile:p.exists()?p.data():null,balance:b.exists()?b.data():null,referral:m.exists()?m.data():null};$('#lookup-result').textContent=JSON.stringify(data,(k,v)=>v?.toDate?v.toDate().toISOString():v,2)}catch(err){message(errorText(err),true)}
 };
 window.addEventListener('pagehide',()=>{generation++;stopRole();clean()});
+
+// ⚠️ تجربة فقط: تعبئة بريد الأدمن التجريبي تلقائيًا
+if(DEV_AUTO_ADMIN){ const el=$('#admin-email'); if(el && !el.value) el.value=DEV_ADMIN_EMAIL; }
 </script></body></html>
