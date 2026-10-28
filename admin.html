@@ -1,0 +1,145 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Marex — لوحة التحكم</title><style>
+*{box-sizing:border-box}body{margin:0;background:#050b20;color:#e7edff;font:15px/1.8 Arial,Tahoma,sans-serif}main{width:min(1120px,94vw);margin:30px auto 70px}h1{font-size:27px;margin-bottom:0}h2{font-size:21px}h3{font-size:18px;margin:0 0 8px}p{margin:8px 0;overflow-wrap:anywhere}small,.hint{color:#aabddd}header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}.panel,.request{padding:22px;background:linear-gradient(145deg,#142748,#101a35);border:1px solid #293f67;border-radius:16px;margin:15px 0}label{display:block;margin:10px 0 5px}input,select,button{font:inherit;color:inherit;border-radius:9px;padding:11px;border:1px solid #3d5680}input,select{width:100%;background:#071329}input[dir=ltr]{text-align:left}button{background:#5d52df;cursor:pointer;margin:6px 0}button:hover{filter:brightness(1.15)}button:disabled{opacity:.5;cursor:wait}.danger{background:#81374c;margin-inline-start:10px}.message{padding:14px;border-radius:10px;background:#123d42;margin:12px 0;white-space:pre-wrap;overflow-wrap:anywhere}.message:empty{display:none}.message.error{background:#54253c}.stats{display:grid;grid-template-columns:1fr 1fr;gap:15px}.stats div{padding:17px;border-radius:12px;background:#162b4f}.stats strong{display:block;font-size:30px}.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.toolbar>*{flex:1;min-width:160px}nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}nav button{background:#1a3054}nav .active{background:#6654e8}.requests{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px}.request{margin:0}.request p{font-size:13px;color:#cbd8ed}.request .hint{color:#f3cf91}#identity{font-size:12px;direction:ltr;text-align:right}#login-box{max-width:520px;margin:auto}pre{direction:ltr;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;background:#071329;padding:16px;border-radius:10px}code{direction:ltr;unicode-bidi:isolate;color:#b9d7ff}details{padding:12px;border:1px solid #344466;border-radius:10px;margin:14px 0}summary{cursor:pointer;font-weight:bold}a{color:#aebaff}[hidden]{display:none!important}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #35c9ff;outline-offset:3px}@media(max-width:540px){main{margin-top:14px}.panel{padding:15px}header{align-items:flex-start}h1{font-size:22px}}
+</style></head><body><main><header><div><h1>Marex — لوحة التحكم</h1><p id="identity">جارٍ استعادة الجلسة…</p></div><button id="logout">خروج</button></header><div id="message" role="status" aria-live="polite"></div>
+<section id="login-box" class="panel"><h2>دخول الإدارة</h2><form id="login-form"><label for="admin-pin">رمز فتح اللوحة</label><input id="admin-pin" type="password" inputmode="numeric" autocomplete="off" required><label for="admin-email">بريد حساب Firebase</label><input id="admin-email" type="email" dir="ltr" autocomplete="username"><label for="admin-password">كلمة مرور الحساب</label><input id="admin-password" type="password" autocomplete="current-password"><button id="login-button" type="submit">دخول</button></form><p class="hint">إذا كانت جلسة حسابك موجودة على نفس النطاق، يكفي إدخال رمز فتح اللوحة. وإلا أدخل أيضًا البريد وكلمة مرور حسابك الموجود. رمز الواجهة وحده لا يمنح صلاحيات مالية.</p></section>
+<section id="dashboard" hidden><div class="stats"><div>إيداعات تنتظر المراجعة<strong id="pending-deposits">0</strong></div><div>سحوبات تنتظر المراجعة<strong id="pending-withdrawals">0</strong></div></div><nav aria-label="أقسام الإدارة"><button class="active" data-tab="requests">الطلبات</button><button data-tab="addresses">عناوين الإيداع</button><button data-tab="accounts">الحساب والإحالة</button></nav>
+<section data-panel="requests"><div class="panel toolbar"><select id="status-filter" aria-label="فلترة حالة الطلب"><option value="pending">قيد المراجعة</option><option value="all">الجميع</option><option value="approved">مقبول</option><option value="rejected">مرفوض</option></select><input id="search" placeholder="بحث بمعرف الحساب أو الطلب أو الشبكة" aria-label="البحث"><button id="load-history">تحميل السجل المعالج</button></div><p class="hint">الطلبات المعلقة تتابع دون حد عددي. تحميل السجل يعرض حتى 200 مستند معالج لكل نوع، وليس بالضرورة أحدثها.</p><div id="requests" class="requests"></div></section>
+<section data-panel="addresses" hidden class="panel"><h2>عناوين الإيداع</h2><form id="address-form"><label for="address-network">الشبكة</label><select id="address-network"><option value="BEP20-USDT">BEP20-USDT</option><option value="TRC20-USDT">TRC20-USDT</option><option value="POLYGON-USDT">POLYGON-USDT</option><option value="ETH-USDT">ETH-USDT</option><option value="BEP20-USDC">BEP20-USDC</option><option value="POLYGON-USDC">POLYGON-USDC</option><option value="ETH-USDC">ETH-USDC</option><option value="POLYGON">POLYGON</option><option value="ETH">ETH</option><option value="BNB">BNB</option><option value="TRX">TRX</option><option value="ETH-PYUSD">ETH-PYUSD</option></select><label for="address-value">عنوان الاستقبال</label><input id="address-value" dir="ltr" required autocomplete="off"><button id="save-address">حفظ العنوان</button></form><div id="address-list"></div></section>
+<section data-panel="accounts" hidden class="panel"><h2>بيانات الحساب والإحالة</h2><form id="lookup-form"><label for="lookup-uid">معرف Firebase UID</label><input id="lookup-uid" dir="ltr" required><button>عرض البيانات</button></form><pre id="lookup-result"></pre><p class="hint">تعرض البيانات الحالية دون تعديل يدوي للأرصدة أو تغيير المحيل. ربط الإحالة يتم عند إنشاء الحساب، وتُحدّث الإجماليات عند اعتماد طلباته.</p></section></section>
+<details class="panel"><summary>إعداد Firebase المطلوب قبل التشغيل</summary><p>الملفان يستخدمان نفس المشروع الموجود: <code>hhhxh-5ebe4</code>. ارفعهما على HTTPS وأضف النطاق إلى Authorized domains إذا لم يكن مسجلاً. لا توجد مفاتيح خادم أو Service Account داخل الملفين.</p><p><strong>تفويض الأدمن:</strong> سجل الدخول بحسابك الحالي، وانسخ UID الظاهر أعلى الصفحة. من Firebase Console → Firestore أنشئ المستند <code>admins/UID</code> بالحقل المنطقي <code>enabled: true</code>. يجب منع المتصفحات من إنشاء أو تعديل هذه المجموعة. الرمز <code>1234567</code> يفتح الواجهة فقط؛ إنشاء أدمن تلقائيًا بهذا الرمز المكشوف ليس حماية.</p><p><strong>القواعد لا تُنشر من HTML:</strong> تحتاج قواعد المشروع الحالية إلى السماح للأدمن المفوّض بقراءة وإدارة الطلبات والأرصدة وعناوين الإيداع والعمولات وبيانات الفريق. لا تستبدل القواعد الحالية بقواعد عامة؛ الملف المصدر لا يتضمن القواعد المنشورة، لذلك لا يمكن التحقق منها هنا.</p><p><strong>المسارات الإضافية:</strong> <code>inviteCodes/{code}</code> لفهرس الرموز، <code>referralMembers/{memberUid}</code> لعضوية الفريق وإجمالياته، و<code>admins/{uid}</code> للتفويض. تمت إضافة حقول إلى <code>users</code> و<code>commissionTransactions</code> دون حذف حقولك أو تغيير مشروع المصادقة.</p><p><strong>ضوابط يجب دمجها مع قواعدك:</strong> اسمح بقراءة رمز واحد من inviteCodes قبل تسجيل الحساب للتحقق من الدعوة، مع منع سرد المجموعة. لا تسمح بحجز الرمز إلا لصاحبه وفي نفس معاملة إنشاء/تحديث users.inviteCode، مع عدم الاستيلاء على رمز محجوز. اسمح للمستخدم بقراءة عضويته، وللمحيل بقراءة أعضاء فريقه بواسطة referrerUid. إنشاء العضوية يقتصر على صاحبها، بإجماليات صفرية ومحيل مطابق لملفه وغير نفسه؛ تعديل الإجماليات للأدمن فقط. يجب أن تكون referredBy وusedInviteCode وreferralAssigned غير قابلة لإعادة التعيين بعد تثبيتها، وأن يطابق referredBy صاحب usedInviteCode في الفهرس.</p><p>المستخدم ينشئ طلبه فقط بحالة pending ولا يستطيع قبوله أو تعديل المبلغ بعد الإرسال. يجب حماية balance وcommissionTransactions بقواعد مطابقة لكل عملية؛ لا تمنح المستخدم حق كتابة رصيد أو عمولة بلا تحقق. قواعد العجلة والتعدين الأصلية تحتاج أيضًا إلى تحقق مستقل، ولا يجعل مؤقت المتصفح نظامًا ماليًا موثوقًا.</p><p><strong>الحساب عند الموافقة:</strong> قبول الإيداع يزيد رصيد العضو ورأس ماله، ويزيد إيداعات فريق المحيل ويضيف <code>floor(amount / 50) × 3.50</code> إلى عمولة المحيل. إيداع 50 = 3.50، 100 = 7، 150 = 10.50. كل طلب يحسب مرة واحدة فقط. السحب المعتمد ينقص رصيد العضو ورأس ماله ويزيد سحوبات الفريق بالمبلغ الإجمالي للطلب. الرفض لا يغير أي رصيد.</p><p>العمولة للأعضاء المباشرين فقط؛ لم تُضف نسبًا للمستويين الثاني والثالث. العمليات التي اعتمدت قبل هذا التعديل لا تُحتسب مجددًا ولا تُرحّل تلقائيًا. اللوحة لا تنقل أموالاً على البلوكتشين ولا تتحقق من وصولها تلقائيًا؛ تحقق من التحويل الفعلي قبل الموافقة. لا تعدّل status من Firebase Console وحده إذا أردت تنفيذ التسوية؛ استخدم زر الموافقة هنا.</p><p><strong>حدود التحقق:</strong> لم تُنشر قواعد أو خدمات على مشروعك ولم تُجر اختبارات مالية على حساباتك الحقيقية. ظهور permission-denied يعني أن الصلاحيات غير مهيأة. تشغيل الملفين لا يمنح سلطة نشر قواعد أو إنشاء أدمن موثوق من تلقاء نفسه.</p></details></main><script type="module">import {initializeApp} from 'https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js';
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from 'https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js';
+import {getFirestore,doc,getDoc,collection,query,where,limit,onSnapshot,runTransaction,serverTimestamp,setDoc} from 'https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js';
+const firebaseConfig={apiKey:'AIzaSyBvzfJOOjRFZnTgTUrwEZQPr8Ba7zKKlNg',authDomain:'hhhxh-5ebe4.firebaseapp.com',projectId:'hhhxh-5ebe4',storageBucket:'hhhxh-5ebe4.firebasestorage.app',messagingSenderId:'79243000696',appId:'1:79243000696:web:ee0fb2d2ccce791954e68d',measurementId:'G-08BR6LN6PT'};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=s=>document.querySelector(s);
+let unlocked=false,authorized=false,subscriptions=[],rows={deposit:[],withdraw:[]},generation=0,roleUnsubscribe=null,historyRows=[];
+const pending=r=>['pending','waiting','processing'].includes(String(r.status||'pending').toLowerCase());
+const accepted=r=>['approved','completed'].includes(String(r.status).toLowerCase());
+const round=v=>Math.round(v*1e6)/1e6;
+const stamp=v=>typeof v?.toMillis==='function'?v.toMillis():0;
+const number=v=>typeof v==='number'&&Number.isFinite(v)&&v>=0;
+function message(text,error=false){$('#message').textContent=text;$('#message').className=error?'message error':'message'}
+function clean(){subscriptions.splice(0).forEach(f=>f());rows={deposit:[],withdraw:[]};historyRows=[];$('#load-history').disabled=false;authorized=false;$('#dashboard').hidden=true;$('#login-box').hidden=false;render()}
+function stopRole(){if(roleUnsubscribe)roleUnsubscribe();roleUnsubscribe=null}
+function errorText(e){return e?.code==='permission-denied'?'رفضت قواعد Firestore العملية. راجع صلاحيات حساب الإدارة والقواعد الحالية، ولا تفتح القاعدة للعامة.':e?.code?.startsWith('auth/')?'تعذر تسجيل الدخول. تحقق من البريد وكلمة المرور والنطاق المصرح به.':e?.message||'تعذر الاتصال بـ Firebase'}
+async function checkRole(){
+ const version=++generation;stopRole();clean();const user=auth.currentUser;
+ $('#identity').textContent=user?'UID: '+user.uid:'لم يتم تسجيل الدخول';
+ if(!user||!unlocked)return;
+ try{
+  const role=await getDoc(doc(db,'admins',user.uid));
+  if(version!==generation||auth.currentUser?.uid!==user.uid)return;
+  if(!role.exists()||role.data().enabled!==true){message('الحساب غير مفوّض كأدمن. أنشئ admins/'+user.uid+' بالحقل enabled: true من Firebase Console، مع حماية هذه المجموعة من كتابة المستخدمين.',true);return}
+  authorized=true;$('#dashboard').hidden=false;$('#login-box').hidden=true;message('متصل — لا تُحسب الأموال والإحالات إلا بعد تأكيد المعاملة من Firebase.');watch();
+  roleUnsubscribe=onSnapshot(doc(db,'admins',user.uid),s=>{if(!s.exists()||s.data().enabled!==true){unlocked=false;generation++;stopRole();clean();message('تم إيقاف صلاحية الإدارة.',true)}},e=>{unlocked=false;generation++;stopRole();clean();message(errorText(e),true)});
+ }catch(e){if(version===generation)message(errorText(e),true)}
+}
+onAuthStateChanged(auth,checkRole);
+$('#login-form').onsubmit=async e=>{
+ e.preventDefault();const button=$('#login-button');if(button.disabled)return;button.disabled=true;
+ try{
+  if($('#admin-pin').value!=='1234567')throw new Error('رمز فتح اللوحة غير صحيح');
+  unlocked=true;
+  const email=$('#admin-email').value.trim(),password=$('#admin-password').value;
+  if(email||password){if(!email||!password)throw new Error('أدخل البريد وكلمة مرور الحساب معًا');await signInWithEmailAndPassword(auth,email,password)}
+  if(!auth.currentUser)throw new Error('سجل الدخول بحساب Firebase الحالي أولًا');
+  await checkRole();
+ }catch(err){unlocked=false;message(errorText(err),true)}finally{button.disabled=false;$('#admin-password').value='';$('#admin-pin').value=''}
+};
+$('#logout').onclick=async()=>{unlocked=false;generation++;stopRole();clean();try{await signOut(auth)}catch(e){message(errorText(e),true)}};
+for(const b of document.querySelectorAll('[data-tab]'))b.onclick=()=>{
+ for(const x of document.querySelectorAll('[data-tab]'))x.classList.toggle('active',x===b);
+ for(const panel of document.querySelectorAll('[data-panel]'))panel.hidden=panel.dataset.panel!==b.dataset.tab;
+};
+$('#status-filter').onchange=render;$('#search').oninput=render;
+function watch(){
+ const version=generation;
+ for(const [kind,path] of [['deposit','depositRequests'],['withdraw','withdrawalRequests']]){
+  subscriptions.push(onSnapshot(query(collection(db,path),where('status','in',['pending','waiting','processing'])),snap=>{if(version!==generation||!authorized)return;rows[kind]=snap.docs.map(d=>({...d.data(),id:d.id,kind}));render()},e=>message(errorText(e),true)));
+ }
+ // Completed history is explicitly fetched on demand, so pending requests are never hidden by a limit.
+ subscriptions.push(onSnapshot(query(collection(db,'depositAddresses')),snap=>{if(version!==generation||!authorized)return;const panel=$('#address-list');panel.replaceChildren();for(const d of snap.docs){const row=document.createElement('p');row.textContent=d.id+' : '+(d.data().address||'غير مضبوط');panel.append(row)}},e=>message(errorText(e),true)));
+}
+$('#load-history').onclick=async()=>{
+ if(!authorized)return;
+ subscriptions.push(onSnapshot(query(collection(db,'depositRequests'),where('status','in',['approved','completed','rejected','cancelled']),limit(200)),snap=>{if(!authorized)return;historyRows=historyRows.filter(r=>r.kind!=='deposit').concat(snap.docs.map(d=>({...d.data(),id:d.id,kind:'deposit'})));render()},e=>message(errorText(e),true)));
+ subscriptions.push(onSnapshot(query(collection(db,'withdrawalRequests'),where('status','in',['approved','completed','rejected','cancelled']),limit(200)),snap=>{if(!authorized)return;historyRows=historyRows.filter(r=>r.kind!=='withdraw').concat(snap.docs.map(d=>({...d.data(),id:d.id,kind:'withdraw'})));render()},e=>message(errorText(e),true)));
+ $('#load-history').disabled=true;
+};
+function render(){
+ const panel=$('#requests');if(!panel)return;panel.replaceChildren();
+ const all=[...rows.deposit,...rows.withdraw,...historyRows],filter=$('#status-filter').value,search=$('#search').value.trim().toLowerCase();
+ const unique=[...new Map(all.map(r=>[r.kind+':'+r.id,r])).values()];
+ const visible=unique.filter(r=>(filter==='all'||filter==='pending'&&pending(r)||filter==='approved'&&accepted(r)||filter==='rejected'&&r.status==='rejected')&&(!search||[r.uid,r.id,r.network].some(x=>String(x||'').toLowerCase().includes(search)))).sort((a,b)=>stamp(b.createdAt)-stamp(a.createdAt));
+ $('#pending-deposits').textContent=rows.deposit.length;$('#pending-withdrawals').textContent=rows.withdraw.length;
+ if(!visible.length){panel.textContent='لا توجد طلبات مطابقة';return}
+ for(const r of visible){
+  const card=document.createElement('article');card.className='request';
+  const head=document.createElement('h3');head.textContent=(r.kind==='deposit'?'طلب إيداع':'طلب سحب')+' — '+r.amount+' USDT';card.append(head);
+  for(const [label,value] of [['الحالة',r.status],['الحساب',r.uid],['الطلب',r.id],['الشبكة',r.network],['العنوان',r.kind==='deposit'?r.depositAddress:r.address],['الصافي',r.netAmount],['التاريخ',stamp(r.createdAt)?new Date(stamp(r.createdAt)).toLocaleString('ar'):'—']]){if(value===undefined)continue;const p=document.createElement('p');p.textContent=label+': '+value;card.append(p)}
+  if(pending(r)){
+   const note=document.createElement('input');note.placeholder='ملاحظة الإدارة (اختياري)';note.maxLength=500;note.setAttribute('aria-label','ملاحظة الإدارة');card.append(note);
+   if(r.kind==='withdraw'){const hint=document.createElement('p');hint.className='hint';hint.textContent='الموافقة تسجل الصرف وتخصم الرصيد؛ لا ترسل تحويلًا على البلوكتشين. نفذ التحويل الفعلي خارج اللوحة أولًا.';card.append(hint)}
+   const yes=document.createElement('button'),no=document.createElement('button');yes.textContent=r.kind==='withdraw'?'تأكيد تنفيذ السحب والموافقة':'قبول الإيداع';no.textContent='رفض';no.className='danger';card.append(yes,no);
+   const perform=async approve=>{yes.disabled=no.disabled=true;try{const result=await settleRequest(r.kind,r.id,approve,note.value.trim());message(result==='already'?'تمت معالجة الطلب سابقًا؛ لم يُحتسب مرة ثانية.':approve?'تم اعتماد الطلب وتحديث الرصيد والإحالة في معاملة واحدة.':'تم رفض الطلب دون تغيير الأرصدة.')}catch(e){message(errorText(e),true);yes.disabled=no.disabled=false}};
+   yes.onclick=()=>perform(true);no.onclick=()=>perform(false);
+  }
+  panel.append(card);
+ }
+}
+// All request state, wallet and referral updates commit atomically. Transaction retries do not duplicate credits.
+async function settleRequest(kind,id,approve,note=''){
+ if(!authorized||!auth.currentUser)throw new Error('يلزم تسجيل الدخول بصلاحية إدارة');
+ const adminUid=auth.currentUser.uid;
+ return runTransaction(db,async tx=>{
+  const requestRef=doc(db,kind==='deposit'?'depositRequests':'withdrawalRequests',id);
+  const requestSnap=await tx.get(requestRef);if(!requestSnap.exists())throw new Error('الطلب غير موجود');
+  const r=requestSnap.data();if(!pending(r))return 'already';
+  if(typeof r.uid!=='string'||!number(r.amount)||r.amount<(kind==='deposit'?50:5)||r.amount>99999999||round(r.amount)!==r.amount)throw new Error('بيانات المبلغ غير صالحة');
+  if(!approve){tx.update(requestRef,{status:'rejected',reviewedBy:adminUid,reviewedAt:serverTimestamp(),adminNote:note});return 'rejected'}
+  const walletRef=doc(db,'balance',r.uid),profileRef=doc(db,'users',r.uid),memberRef=doc(db,'referralMembers',r.uid);
+  const [walletSnap,profileSnap,memberSnap]=await Promise.all([tx.get(walletRef),tx.get(profileRef),tx.get(memberRef)]);
+  const b=walletSnap.exists()?walletSnap.data():{amount:0,commissionAmount:0};
+  if(!number(b.amount)||!number(b.commissionAmount??0)||!number(b.capital??b.amount))throw new Error('الرصيد الحالي غير صالح؛ لم يتم تغيير الطلب');
+  if(kind==='withdraw'&&b.amount<r.amount)throw new Error('الرصيد الحالي لا يكفي لاعتماد السحب');
+  const profile=profileSnap.exists()?profileSnap.data():{};
+  const member=memberSnap.exists()?memberSnap.data():null;
+  const referrer=profile.referredBy||member?.referrerUid||null;
+  if(referrer===r.uid)throw new Error('إحالة ذاتية غير صالحة');
+  if(member&&profile.referredBy&&member.referrerUid!==profile.referredBy)throw new Error('بيانات المحيل غير متطابقة');
+  const reward=kind==='deposit'&&referrer?round(Math.floor(Math.round(r.amount*1e6)/50000000)*3.5):0;
+  let refBalanceRef=null,refBalanceSnap=null,commissionRef=null,commissionSnap=null;
+  if(reward>0){refBalanceRef=doc(db,'balance',referrer);commissionRef=doc(db,'commissionTransactions','referral_deposit_'+id);[refBalanceSnap,commissionSnap]=await Promise.all([tx.get(refBalanceRef),tx.get(commissionRef)]);if(commissionSnap.exists())throw new Error('سجل عمولة سابق موجود لهذا الطلب؛ أوقف الاعتماد وراجع البيانات')}
+  const oldMember=member||{uid:r.uid,referrerUid:referrer,depositTotal:0,withdrawalTotal:0,commissionTotal:0};
+  if(referrer&&(!number(oldMember.depositTotal??0)||!number(oldMember.withdrawalTotal??0)||!number(oldMember.commissionTotal??0)))throw new Error('إجماليات الفريق غير صالحة');
+  const delta=kind==='deposit'?r.amount:-r.amount;
+  const walletPatch={uid:r.uid,currency:'USDT',amount:round(b.amount+delta),capital:round(Math.max(0,(b.capital??b.amount)+delta)),updatedAt:serverTimestamp()};
+  tx.set(walletRef,walletPatch,{merge:true});
+  if(referrer){
+   const patch={uid:r.uid,referrerUid:referrer,updatedAt:serverTimestamp()};
+   if(!member)Object.assign(patch,{depositTotal:0,withdrawalTotal:0,commissionTotal:0,createdAt:serverTimestamp()});
+   if(kind==='deposit'){patch.depositTotal=round((oldMember.depositTotal||0)+r.amount);patch.commissionTotal=round((oldMember.commissionTotal||0)+reward)}else patch.withdrawalTotal=round((oldMember.withdrawalTotal||0)+r.amount);
+   tx.set(memberRef,patch,{merge:true});
+  }
+  if(reward>0){
+   const rb=refBalanceSnap.exists()?refBalanceSnap.data():{amount:0,commissionAmount:0};
+   if(!number(rb.amount)||!number(rb.commissionAmount??0))throw new Error('رصيد المحيل غير صالح');
+   tx.set(refBalanceRef,{uid:referrer,currency:'USDT',...(refBalanceSnap.exists()?{}:{amount:0}),commissionAmount:round((rb.commissionAmount||0)+reward),updatedAt:serverTimestamp()},{merge:true});
+   tx.set(commissionRef,{uid:referrer,kind:'referral',memberUid:r.uid,depositRequestId:id,depositAmount:r.amount,amount:reward,wallet:'commission',currency:'USDT',status:'completed',createdAt:serverTimestamp()});
+  }
+  tx.update(requestRef,{status:'approved',settled:true,settlementVersion:1,referrerUid:referrer,referralCommission:reward,reviewedBy:adminUid,reviewedAt:serverTimestamp(),updatedAt:serverTimestamp(),adminNote:note});
+  return 'approved';
+ });
+}
+$('#address-form').onsubmit=async e=>{
+ e.preventDefault();if(!authorized)return;const network=$('#address-network').value,address=$('#address-value').value.trim();
+ const valid=(network.startsWith('TRC20')||network==='TRX')?/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(address):/^0x[0-9a-fA-F]{40}$/.test(address);
+ if(!valid){message('العنوان غير صحيح للشبكة المختارة.',true);return}
+ const button=$('#save-address');button.disabled=true;
+ try{await setDoc(doc(db,'depositAddresses',network),{address,updatedAt:serverTimestamp(),updatedBy:auth.currentUser.uid},{merge:true});message('تم حفظ عنوان الإيداع')}catch(err){message(errorText(err),true)}finally{button.disabled=false}
+};
+$('#lookup-form').onsubmit=async e=>{
+ e.preventDefault();if(!authorized)return;const uid=$('#lookup-uid').value.trim();if(!uid||uid.includes('/'))return;
+ try{const [p,b,m]=await Promise.all([getDoc(doc(db,'users',uid)),getDoc(doc(db,'balance',uid)),getDoc(doc(db,'referralMembers',uid))]);const data={uid,profile:p.exists()?p.data():null,balance:b.exists()?b.data():null,referral:m.exists()?m.data():null};$('#lookup-result').textContent=JSON.stringify(data,(k,v)=>v?.toDate?v.toDate().toISOString():v,2)}catch(err){message(errorText(err),true)}
+};
+window.addEventListener('pagehide',()=>{generation++;stopRole();clean()});
+</script></body></html>
